@@ -1,0 +1,291 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load i18n %}
+
+{% block title %}Blog — Unisha Chaulagain{% endblock %}
+
+{% block extra_css %}
+<style>
+    .blog-hero {
+        padding: 1.75rem 1.5rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+    }
+
+    .blog-hero-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    /* Tag filters */
+    .tag-bar {
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+        overflow-x: auto;
+    }
+
+    .tag-bar-inner {
+        max-width: var(--max-w);
+        margin: 0 auto;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .tag-pill {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.4rem 0.85rem;
+        background: var(--bg2);
+        color: var(--text2);
+        border: 1.5px solid var(--border);
+        border-radius: 100px;
+        text-decoration: none;
+        transition: all 180ms;
+        white-space: nowrap;
+    }
+    .tag-pill:hover, .tag-pill.active {
+        background: var(--accent-bg);
+        border-color: rgba(29,78,216,0.35);
+        color: var(--accent);
+    }
+
+    /* Blog grid */
+    .blog-main {
+        padding: 1.5rem 1.5rem 3rem;
+        background: var(--bg);
+    }
+
+    .blog-main-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .blog-card {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 200ms;
+        text-decoration: none;
+    }
+    .blog-card:hover { border-color: var(--border2); box-shadow: var(--shadow); transform: translateY(-4px); }
+
+    .blog-card-cover {
+        height: 160px;
+        background: var(--bg2);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .blog-card-cover img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform 400ms;
+    }
+    .blog-card:hover .blog-card-cover img { transform: scale(1.04); }
+
+    .blog-cover-placeholder {
+        font-size: 3rem;
+        width: 100%; height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--bg2), var(--bg3));
+    }
+
+    .blog-card-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .blog-card-date {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--text3);
+        margin-bottom: 0.6rem;
+    }
+
+    .blog-card-title {
+        font-family: var(--serif);
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.65rem;
+        line-height: 1.35;
+        letter-spacing: -0.2px;
+    }
+
+    .blog-card-excerpt {
+        font-size: 0.875rem;
+        color: var(--text2);
+        line-height: 1.7;
+        margin-bottom: 1.25rem;
+        flex: 1;
+    }
+
+    .blog-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .blog-tags-row { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+    .btag {
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 4px;
+    }
+
+    .read-more {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        white-space: nowrap;
+    }
+
+    .no-posts {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 5rem 1.5rem;
+        color: var(--text3);
+    }
+
+    .post-type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 0.2rem 0.55rem;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    .pt-blog     { background: rgba(29,78,216,0.1);   color: var(--accent); }
+    .pt-research { background: rgba(90,108,192,0.1);  color: #5a6cc0; }
+    .pt-tutorial { background: rgba(34,160,107,0.1);  color: #22a06b; }
+    .pt-note     { background: rgba(150,150,150,0.1); color: #888; }
+
+    .read-time-tag {
+        font-family: var(--mono);
+        font-size: 0.63rem;
+        color: var(--text3);
+    }
+
+    @media (max-width: 640px) {
+        .blog-hero { padding: 1.25rem 1rem 1rem; }
+        .blog-hero-inner h1 { font-size: clamp(1.5rem, 8vw, 2rem); }
+        .blog-hero-inner p { font-size: 0.84rem; margin-top: 0.4rem; }
+        .tag-bar { padding: 0.55rem 1rem; }
+        .tag-pill { font-size: 0.65rem; padding: 0.3rem 0.65rem; }
+        .blog-main { padding: 1.1rem 1rem 2.5rem; }
+        .blog-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+        .blog-card-cover { height: 140px; }
+        .blog-card-body { padding: 0.85rem 1rem 1rem; }
+        .blog-card-title { font-size: 1rem; }
+        .blog-card-excerpt { font-size: 0.82rem; margin-bottom: 0.85rem; }
+        .blog-card-date { font-size: 0.62rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="blog-hero">
+    <div class="blog-hero-inner" data-aos="fade-up">
+        <span class="section-label">Writing</span>
+        <h1 class="section-title">Blog</h1>
+        <p style="color:var(--text2); font-size:1rem; margin-top:0.75rem; max-width:500px; line-height:1.7;">
+            Thoughts on AI/ML, full-stack development, deployment, and building real products.
+        </p>
+    </div>
+</section>
+
+<!-- TAGS -->
+{% if all_tags %}
+<div class="tag-bar">
+    <div class="tag-bar-inner">
+        <a href="/blog/" class="tag-pill {% if not active_tag %}active{% endif %}">All Posts</a>
+        {% for tag in all_tags %}
+        <a href="/blog/?tag={{ tag }}" class="tag-pill {% if active_tag == tag %}active{% endif %}">{{ tag }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- GRID -->
+<section class="blog-main">
+    <div class="blog-main-inner">
+        <div class="blog-grid">
+            {% if posts %}
+                {% for post in posts %}
+                <a href="/blog/{{ post.slug }}/" class="blog-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|mul:60 }}">
+                    <div class="blog-card-cover">
+                        {% if post.cover_image %}
+                            <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" loading="lazy">
+                        {% else %}
+                            <div class="blog-cover-placeholder">📝</div>
+                        {% endif %}
+                    </div>
+                    <div class="blog-card-body">
+                        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+                            {% if post.post_type == 'blog' %}
+                                <span class="post-type-badge pt-blog">✍ Blog</span>
+                            {% elif post.post_type == 'research' %}
+                                <span class="post-type-badge pt-research">🔬 Research</span>
+                            {% elif post.post_type == 'tutorial' %}
+                                <span class="post-type-badge pt-tutorial">📖 Tutorial</span>
+                            {% elif post.post_type == 'note' %}
+                                <span class="post-type-badge pt-note">📌 Note</span>
+                            {% endif %}
+                            {% if post.read_time %}
+                                <span class="read-time-tag">· {{ post.read_time }} min read</span>
+                            {% endif %}
+                        </div>
+                        <div class="blog-card-date">{{ post.created_at|date:"M d, Y" }}</div>
+                        <h3 class="blog-card-title">{{ post.title }}</h3>
+                        <p class="blog-card-excerpt">{{ post.excerpt|truncatewords:18 }}</p>
+                        <div class="blog-card-footer">
+                            <div class="blog-tags-row">
+                                {% for tag in post.get_tags_list|slice:":2" %}
+                                <span class="btag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            <span class="read-more">Read <i class="bi bi-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div class="no-posts">
+                    <p>No posts yet — check back soon.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}

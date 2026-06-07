@@ -1,0 +1,464 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load i18n %}
+
+{% block title %}Projects — Unisha Chaulagain{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-hero {
+        padding: 1.75rem 1.5rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+    }
+
+    .page-hero-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    /* Filter bar */
+    .filter-bar {
+        background: linear-gradient(135deg, rgba(29,78,216,0.07) 0%, rgba(29,78,216,0.04) 100%);
+        border-top: 1px solid rgba(29,78,216,0.12);
+        border-bottom: 1.5px solid rgba(29,78,216,0.14);
+        position: sticky;
+        top: 46px;
+        z-index: 100;
+        padding: 0 1.5rem;
+    }
+
+    .filter-bar-inner {
+        max-width: var(--max-w);
+        margin: 0 auto;
+        display: flex;
+        gap: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .filter-bar-inner::-webkit-scrollbar { display: none; }
+
+    .fbtn {
+        font-family: var(--mono);
+        font-size: 0.73rem;
+        font-weight: 600;
+        padding: 0.8rem 1.1rem;
+        background: transparent;
+        color: rgba(29,78,216,0.5);
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 180ms;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        margin-bottom: -1.5px;
+    }
+
+    .fbtn:hover { color: var(--accent); }
+    .fbtn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+
+    /* Grid */
+    .projects-main {
+        padding: 1.5rem 1.5rem 3rem;
+        background: var(--bg);
+    }
+
+    .projects-main-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    .projects-meta {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--text3);
+        margin-bottom: 2rem;
+    }
+
+    .pgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .pcard {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 200ms;
+    }
+    .pcard:hover { border-color: var(--border2); box-shadow: var(--shadow); transform: translateY(-4px); }
+
+    .pcard-img {
+        height: 170px;
+        background: var(--bg2);
+        overflow: hidden;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+    }
+
+    .pcard-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 400ms;
+    }
+    .pcard:hover .pcard-img img { transform: scale(1.04); }
+
+    .pcard-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .pcard-cat {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--accent);
+        margin-bottom: 0.55rem;
+    }
+
+    .pcard-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.6rem;
+        letter-spacing: -0.2px;
+        line-height: 1.3;
+    }
+
+    .pcard-desc {
+        font-size: 0.875rem;
+        color: var(--text2);
+        line-height: 1.7;
+        margin-bottom: 1.1rem;
+        flex: 1;
+    }
+
+    .pcard-tech {
+        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.1rem;
+    }
+
+    .tech-tag {
+        font-family: var(--mono);
+        font-size: 0.63rem;
+        font-weight: 600;
+        padding: 0.22rem 0.5rem;
+        background: var(--bg2);
+        color: var(--text3);
+        border-radius: 4px;
+        border: 1px solid var(--border);
+    }
+
+    .pcard-links { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .plbtn {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.42rem 0.8rem;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        transition: all 180ms;
+    }
+
+    .plbtn-gh {
+        background: var(--bg2);
+        color: var(--text2);
+        border: 1.5px solid var(--border2);
+    }
+    .plbtn-gh:hover { background: var(--text); color: #fff; border-color: var(--text); }
+
+    .plbtn-live {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1.5px solid rgba(29,78,216,0.28);
+    }
+    .plbtn-live:hover { background: var(--accent); color: #fff; }
+
+    .no-projs {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 5rem 1.5rem;
+        color: var(--text3);
+    }
+
+    /* Priority badges */
+    .badge-major {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 0.22rem 0.55rem;
+        border-radius: 4px;
+        background: rgba(234,179,8,0.12);
+        color: #CA8A04;
+        border: 1px solid rgba(234,179,8,0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 0.55rem;
+    }
+
+    .badge-minor {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 0.22rem 0.55rem;
+        border-radius: 4px;
+        background: rgba(99,102,241,0.1);
+        color: #818CF8;
+        border: 1px solid rgba(99,102,241,0.25);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 0.55rem;
+    }
+
+    /* Priority filter strip */
+    .priority-strip {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .priority-strip-label {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-right: 0.25rem;
+    }
+
+    .pfbtn {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        background: var(--bg2);
+        color: var(--text3);
+        border: 1.5px solid var(--border);
+        cursor: pointer;
+        transition: all 180ms;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .pfbtn:hover { color: var(--text2); border-color: var(--border2); }
+    .pfbtn.active-major { background: rgba(234,179,8,0.1); color: #CA8A04; border-color: rgba(234,179,8,0.35); }
+    .pfbtn.active-minor { background: rgba(99,102,241,0.1); color: #818CF8; border-color: rgba(99,102,241,0.3); }
+    .pfbtn.active-all { background: var(--accent-bg); color: var(--accent); border-color: rgba(29,78,216,0.35); }
+
+    /* Major card highlight */
+    .pcard.is-major { border-color: rgba(234,179,8,0.35); box-shadow: 0 0 0 1px rgba(234,179,8,0.1); }
+    .pcard.is-minor { border-color: rgba(99,102,241,0.3); }
+
+    /* CTA */
+    .proj-cta {
+        padding: 2.5rem 1.5rem;
+        border-top: 1px solid var(--border);
+        background: var(--bg2);
+        text-align: center;
+    }
+
+    .proj-cta h2 {
+        font-size: clamp(1.4rem, 3vw, 2rem);
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .proj-cta p {
+        font-size: 0.9rem;
+        color: var(--text2);
+        margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+        .page-hero { padding: 1.25rem 1rem 1rem; }
+        .page-hero-inner h1 { font-size: clamp(1.5rem, 8vw, 2rem); }
+        .page-hero-inner p { font-size: 0.84rem; margin-top: 0.5rem; }
+        .projects-main { padding: 1.1rem 1rem 2.5rem; }
+        .pgrid { grid-template-columns: 1fr; gap: 0.75rem; }
+        .pcard-body { padding: 0.9rem 1rem 1rem; }
+        .pcard-img { height: 140px; }
+        .pcard-title { font-size: 1rem; }
+        .pcard-desc { font-size: 0.82rem; }
+        .priority-strip { gap: 0.3rem; margin-bottom: 0.75rem; }
+        .pfbtn { font-size: 0.6rem; padding: 0.22rem 0.55rem; }
+        .projects-meta { font-size: 0.7rem; margin-bottom: 0.75rem; }
+        .fbtn { font-size: 0.65rem; padding: 0.65rem 0.75rem; }
+        .proj-cta { padding: 1.6rem 1rem; }
+        .proj-cta h2 { font-size: clamp(1.2rem, 6vw, 1.5rem); }
+        .proj-cta p { font-size: 0.82rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+    <div class="page-hero-inner" data-aos="fade-up">
+        <span class="section-label">Portfolio</span>
+        <h1 class="section-title">All Projects</h1>
+        <p style="color:var(--text2); font-size:1rem; margin-top:0.75rem; max-width:520px; line-height:1.7;">
+            Full-stack web apps, AI/ML systems, deep learning models, NLP pipelines — everything I've built, trained, and shipped.
+        </p>
+    </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+    <div class="filter-bar-inner">
+        <button class="fbtn active" data-filter="all">All</button>
+        {% for value, label in categories %}
+        <button class="fbtn" data-filter="{{ value }}">{{ label }}</button>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- GRID -->
+<section class="projects-main">
+    <div class="projects-main-inner">
+        <div class="priority-strip">
+            <span class="priority-strip-label">Filter:</span>
+            <button class="pfbtn active-all" data-priority="all">All Projects</button>
+            <button class="pfbtn" data-priority="major">⭐ Major</button>
+            <button class="pfbtn" data-priority="minor">· Minor</button>
+        </div>
+
+        <p class="projects-meta">Showing <span id="countNum">{{ projects|length }}</span> <span id="projLabel">project{{ projects|length|pluralize }}</span></p>
+
+        <div class="pgrid" id="pgrid">
+            {% if projects %}
+                {% for project in projects %}
+                <div class="pcard {% if project.priority == 'major' %}is-major{% elif project.priority == 'minor' %}is-minor{% endif %}" data-category="{{ project.category }}" data-priority="{{ project.priority }}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|mul:50 }}">
+                    <div class="pcard-img">
+                        {% if project.image %}
+                            <img src="{{ project.image.url }}" alt="{{ project.title }}" loading="lazy">
+                        {% else %}
+                            {% if project.category == 'ai_ml' %}🤖
+                            {% elif project.category == 'deep_learning' %}🧠
+                            {% elif project.category == 'django' %}🌐
+                            {% elif project.category == 'data' %}📊
+                            {% else %}🚀{% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="pcard-body">
+                        {% if project.priority == 'major' %}
+                            <div class="badge-major">⭐ Major Project</div>
+                        {% elif project.priority == 'minor' %}
+                            <div class="badge-minor">· Minor Project</div>
+                        {% endif %}
+                        <div class="pcard-cat">{{ project.get_category_display }}</div>
+                        <h3 class="pcard-title">{{ project.title }}</h3>
+                        <p class="pcard-desc">{{ project.description|truncatewords:28 }}</p>
+                        <div class="pcard-tech">
+                            {% for tech in project.get_tech_list %}
+                            <span class="tech-tag">{{ tech }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="pcard-links">
+                            {% if project.github_url %}
+                            <a href="{{ project.github_url }}" target="_blank" rel="noopener" class="plbtn plbtn-gh">
+                                <i class="bi bi-github"></i> GitHub
+                            </a>
+                            {% endif %}
+                            {% if project.live_url %}
+                            <a href="{{ project.live_url }}" target="_blank" rel="noopener" class="plbtn plbtn-live">
+                                <i class="bi bi-box-arrow-up-right"></i> Live Demo
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-projs">
+                    <p>No projects yet — add them via the <a href="/admin/">admin panel</a>.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div id="noResults" style="display:none; text-align:center; padding:4rem; color:var(--text3); font-size:0.95rem;">
+            No projects in this category yet.
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="proj-cta">
+    <h2>Have a Project Idea?</h2>
+    <p>I'm available for freelance projects, collaborations, and full-time roles.</p>
+    <a href="/contact/" class="btn-warm"><i class="bi bi-envelope"></i> Get In Touch</a>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const fbtns = document.querySelectorAll('.fbtn');
+    const pfbtns = document.querySelectorAll('.pfbtn');
+    const cards = document.querySelectorAll('.pcard');
+    const countEl = document.getElementById('countNum');
+    const noRes = document.getElementById('noResults');
+
+    let activeCat = 'all';
+    let activePriority = 'all';
+
+    function applyFilters() {
+        let visible = 0;
+        cards.forEach(c => {
+            const catOk = activeCat === 'all' || c.dataset.category === activeCat;
+            const priOk = activePriority === 'all' || c.dataset.priority === activePriority;
+            const show = catOk && priOk;
+            c.style.display = show ? 'flex' : 'none';
+            if (show) visible++;
+        });
+        countEl.textContent = visible;
+        const label = document.getElementById('projLabel');
+        if (label) label.textContent = visible === 1 ? 'project' : 'projects';
+        noRes.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    fbtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            fbtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            activeCat = this.dataset.filter;
+            applyFilters();
+        });
+    });
+
+    pfbtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            pfbtns.forEach(b => b.classList.remove('active-all', 'active-major', 'active-minor'));
+            activePriority = this.dataset.priority;
+            if (activePriority === 'all') this.classList.add('active-all');
+            else if (activePriority === 'major') this.classList.add('active-major');
+            else if (activePriority === 'minor') this.classList.add('active-minor');
+            applyFilters();
+        });
+    });
+</script>
+{% endblock %}

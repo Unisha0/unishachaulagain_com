@@ -1,0 +1,509 @@
+{% load static %}
+{% load custom_filters %}
+{% load i18n %}
+<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Unisha Chaulagain — Full-Stack Developer & AI/ML Engineer{% endblock %}</title>
+    <meta name="description" content="Unisha Chaulagain — Full-Stack Developer, AI/ML Engineer, Deployer. Building production systems from Nepal.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&family=Plus+Jakarta+Sans:wght@700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* ═══════════════════════════════════════════════════════
+           UNISHA CHAULAGAIN — WARM WHITE PROFESSIONAL
+           ═══════════════════════════════════════════════════════ */
+        :root {
+            /* Warm white backgrounds */
+            --bg:    #FFFEFB;       /* warm white — main bg */
+            --bg2:   #F7F5F0;       /* very subtly warm for sections */
+            --bg3:   #EEE9E0;       /* warm light gray for hovers */
+            --card:  #FFFFFF;       /* pure white cards */
+
+            /* Borders — warm, refined */
+            --border:  rgba(0,0,0,0.07);
+            --border2: rgba(0,0,0,0.14);
+
+            /* Accent — professional indigo/blue */
+            --accent:    #1D4ED8;           /* vivid professional blue */
+            --accent2:   #1E40AF;           /* deeper blue */
+            --accent-bg: rgba(29,78,216,0.06);
+            --accent-glow: rgba(29,78,216,0.18);
+
+            /* Text hierarchy — warm dark */
+            --text:  #111827;       /* near-black, warm-tinted */
+            --text2: #52525B;       /* zinc-600 — readable mid-gray */
+            --text3: #A1A1AA;       /* zinc-400 — quiet */
+
+            /* Status */
+            --green:     #16A34A;
+            --green-bg:  rgba(22,163,74,0.07);
+            --blue:      #0EA5E9;
+            --blue-bg:   rgba(14,165,233,0.07);
+            --red:       #DC2626;
+            --yellow:    #D97706;
+
+            /* Shadows — soft, warm */
+            --shadow:  0 1px 4px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.06);
+            --shadow2: 0 4px 16px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.1);
+
+            --font:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --serif: 'Plus Jakarta Sans', sans-serif;
+            --mono:  'JetBrains Mono', 'Fira Code', monospace;
+
+            --nav-h: 46px;
+            --max-w: 1220px;
+            --radius: 10px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ── NAVBAR ── */
+        .site-nav {
+            height: var(--nav-h);
+            background: #111827;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 12px rgba(0,0,0,0.18);
+        }
+
+        .nav-inner {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            position: relative;
+        }
+
+        .nav-brand {
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            transition: opacity 200ms;
+        }
+        .nav-brand:hover { opacity: 0.75; color: #fff; }
+
+        .brand-dot {
+            width: 8px; height: 8px;
+            background: #60A5FA;
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(96,165,250,0.6);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            list-style: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a {
+            font-family: var(--font);
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            padding: 0.38rem 1.1rem;
+            border-radius: 6px;
+            transition: all 180ms;
+            letter-spacing: 0.1px;
+        }
+        .nav-links a:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.08);
+        }
+        .nav-links a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            font-weight: 600;
+        }
+
+        .nav-cta-item a {
+            background: var(--accent) !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            border-radius: 7px !important;
+            box-shadow: 0 2px 8px rgba(29,78,216,0.4) !important;
+            transition: all 200ms !important;
+        }
+        .nav-cta-item a:hover {
+            background: var(--accent2) !important;
+            box-shadow: 0 4px 16px rgba(29,78,216,0.5) !important;
+            transform: translateY(-1px);
+            color: #fff !important;
+        }
+
+        .nav-toggle {
+            display: none;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 1.1rem;
+            line-height: 1;
+            transition: all 180ms;
+        }
+        .nav-toggle:hover { color: #fff; background: rgba(255,255,255,0.12); }
+
+        @media (max-width: 780px) {
+            .nav-toggle { display: block; }
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: var(--nav-h);
+                left: 0; right: 0;
+                transform: none;
+                background: #111827;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+                flex-direction: column;
+                padding: 0.75rem 1rem;
+                gap: 0.2rem;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+                align-items: stretch;
+            }
+            .nav-links.open { display: flex; }
+            .nav-links a { display: block; text-align: left; padding: 0.55rem 0.85rem; font-size: 0.85rem; }
+            .nav-brand { font-size: 0.78rem; }
+            .brand-dot { width: 6px; height: 6px; }
+        }
+
+        /* ── MAIN ── */
+        main { padding-top: var(--nav-h); min-height: 80vh; }
+
+        /* ── SECTION HELPERS ── */
+        .section-label {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.7rem;
+        }
+
+        .section-title {
+            font-family: var(--serif);
+            font-size: clamp(1.9rem, 4.5vw, 3rem);
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -1.5px;
+            line-height: 1.08;
+        }
+
+        /* ── BUTTONS ── */
+        .btn-warm {
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.72rem 1.6rem;
+            background: var(--accent);
+            color: #fff;
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            transition: all 220ms;
+            box-shadow: 0 2px 8px rgba(29,78,216,0.22), 0 1px 2px rgba(0,0,0,0.08);
+            letter-spacing: 0.1px;
+        }
+        .btn-warm:hover {
+            background: var(--accent2);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(29,78,216,0.32);
+        }
+
+        .btn-outline {
+            font-family: var(--font);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.72rem 1.6rem;
+            background: #fff;
+            color: var(--text2);
+            border: 1.5px solid var(--border2);
+            border-radius: var(--radius);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            cursor: pointer;
+            transition: all 220ms;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            letter-spacing: 0.1px;
+        }
+        .btn-outline:hover {
+            background: var(--bg2);
+            color: var(--text);
+            border-color: rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* ── FOOTER ── */
+        .site-footer {
+            background: #111827;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 2.75rem 1.5rem 1.75rem;
+            position: relative;
+        }
+
+        .site-footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 500px; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(29,78,216,0.6), transparent);
+        }
+
+        .footer-grid {
+            max-width: var(--max-w);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 2rem;
+            padding-bottom: 1.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .footer-brand h3 {
+            font-family: var(--serif);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+
+        .footer-brand p {
+            font-size: 0.84rem;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-socials { display: flex; gap: 0.5rem; }
+
+        .social-ico {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.45);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 200ms;
+        }
+        .social-ico:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .footer-col h6 {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.25);
+            margin-bottom: 1.1rem;
+        }
+
+        .footer-col a {
+            display: block;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            margin-bottom: 0.55rem;
+            transition: color 180ms;
+        }
+        .footer-col a:hover { color: rgba(255,255,255,0.85); }
+
+        .footer-bottom {
+            max-width: var(--max-w);
+            margin: 2rem auto 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.25);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 780px) {
+            .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; padding-bottom: 1.25rem; }
+            .footer-bottom { justify-content: center; text-align: center; margin-top: 1rem; }
+            .site-footer { padding: 2rem 1.25rem 1.25rem; }
+        }
+
+        @media (max-width: 640px) {
+            .site-footer { padding: 1.75rem 1rem 1rem; }
+            .footer-grid { gap: 1.1rem; }
+            .footer-brand h3 { font-size: 0.95rem; }
+            .footer-brand p { font-size: 0.78rem; margin-bottom: 0.85rem; line-height: 1.55; }
+            .social-ico { width: 30px; height: 30px; font-size: 0.8rem; }
+            .footer-col h6 { font-size: 0.6rem; margin-bottom: 0.6rem; }
+            .footer-col a { font-size: 0.77rem; margin-bottom: 0.4rem; }
+            .footer-bottom { font-size: 0.6rem; }
+            .scroll-top-btn { bottom: 1rem; right: 1rem; width: 32px; height: 32px; font-size: 0.8rem; }
+        }
+
+        /* ── SCROLL TO TOP ── */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 1.75rem; right: 1.75rem;
+            width: 38px; height: 38px;
+            background: #fff;
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--text3);
+            cursor: pointer;
+            transition: all 200ms;
+            z-index: 900;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+        }
+        .scroll-top-btn.vis { display: flex; }
+        .scroll-top-btn:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px rgba(29,78,216,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ── GLOBAL LINKS ── */
+        a { color: var(--accent); text-decoration: none; transition: color 180ms; }
+        a:hover { color: var(--accent2); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav class="site-nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-brand">
+                <span class="brand-dot"></span>
+                UNISHA CHAULAGAIN
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Home</a></li>
+                <li><a href="/projects/" {% if request.resolver_match.url_name == 'projects' %}class="active"{% endif %}>Projects</a></li>
+                <li><a href="/#skills">Skills</a></li>
+                <li><a href="/blog/" {% if 'blog' in request.resolver_match.url_name|default:'' %}class="active"{% endif %}>Blog</a></li>
+                <li class="nav-cta-item"><a href="/contact/">Hire Me</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>{% block content %}{% endblock %}</main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>Unisha Chaulagain</h3>
+                <p>Full-Stack Developer · AI/ML Engineer · Building and deploying production systems end-to-end from Nepal.</p>
+                <div class="footer-socials">
+                    <a href="https://github.com/Unisha0" target="_blank" class="social-ico" title="GitHub"><i class="bi bi-github"></i></a>
+                    <a href="https://www.linkedin.com/in/unisha-chaulagain/" target="_blank" class="social-ico" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    <a href="mailto:yunishachaulagain001@gmail.com" class="social-ico" title="Email"><i class="bi bi-envelope"></i></a>
+                    <a href="https://www.instagram.com/partofyune_sha/" target="_blank" class="social-ico" title="Instagram"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h6>Navigate</h6>
+                <a href="/">Home</a>
+                <a href="/projects/">Projects</a>
+                <a href="/#skills">Skills</a>
+                <a href="/blog/">Blog</a>
+                <a href="/contact/">Contact</a>
+            </div>
+            <div class="footer-col">
+                <h6>Connect</h6>
+                <a href="mailto:yunishachaulagain001@gmail.com">yunishachaulagain001@gmail.com</a>
+                <a href="https://github.com/Unisha0" target="_blank">github.com/Unisha0</a>
+                <a href="https://www.linkedin.com/in/unisha-chaulagain/" target="_blank">LinkedIn Profile</a>
+                <a href="/media/uploads/Unisha_Chaulagain_Django_CV.pdf" target="_blank">Download CV</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© {% now "Y" %} Unisha Chaulagain. All rights reserved.</span>
+            <span>Built with Django · Deployed from Nepal 🇳🇵</span>
+        </div>
+    </footer>
+
+    <button class="scroll-top-btn" id="scrollTopBtn"><i class="bi bi-chevron-up"></i></button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 600, offset: 60, once: true, easing: 'ease-out-cubic' });
+
+        document.getElementById('navToggle').addEventListener('click', () => {
+            document.getElementById('navLinks').classList.toggle('open');
+        });
+
+        const stBtn = document.getElementById('scrollTopBtn');
+        window.addEventListener('scroll', () => stBtn.classList.toggle('vis', window.scrollY > 400));
+        stBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

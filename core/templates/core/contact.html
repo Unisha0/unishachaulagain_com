@@ -1,0 +1,473 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Contact — Unisha Chaulagain{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-page {
+        padding: 2.5rem 1.5rem 3.5rem;
+        background: var(--bg);
+    }
+
+    .contact-page-inner {
+        max-width: 960px;
+        margin: 0 auto;
+    }
+
+    /* Page header — compact */
+    .contact-page-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .contact-page-header h1 {
+        font-family: var(--serif);
+        font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -1px;
+        margin-top: 0.4rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .contact-page-header p {
+        font-size: 0.9rem;
+        color: var(--text2);
+        line-height: 1.6;
+    }
+
+    /* Two-column layout */
+    .contact-layout {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    /* ── LEFT: Info ── */
+    .contact-info-heading {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.4rem;
+    }
+
+    .contact-info-sub {
+        font-size: 0.82rem;
+        color: var(--text2);
+        line-height: 1.65;
+        margin-bottom: 1.25rem;
+    }
+
+    .contact-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .ci-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0.9rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: border-color 160ms;
+    }
+    .ci-row:hover { border-color: var(--accent); }
+
+    .ci-icon {
+        width: 32px; height: 32px;
+        background: var(--accent-bg);
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    .ci-label {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text3);
+        margin-bottom: 0.1rem;
+    }
+
+    .ci-value {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.3;
+    }
+    .ci-value a { color: var(--accent); }
+    .ci-value a:hover { color: var(--accent2); }
+
+    .contact-socials { display: flex; gap: 0.45rem; }
+
+    .contact-social-btn {
+        width: 34px; height: 34px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text3);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 160ms;
+    }
+    .contact-social-btn:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    /* ── RIGHT: Form ── */
+    .contact-form-wrap {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.75rem;
+        box-shadow: var(--shadow);
+    }
+
+    .form-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1.25rem;
+        letter-spacing: -0.2px;
+        padding-bottom: 0.9rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .fgroup { margin-bottom: 0.85rem; }
+
+    .flabel {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text2);
+        margin-bottom: 0.3rem;
+    }
+
+    .finput, .ftextarea {
+        width: 100%;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 0.65rem 0.85rem;
+        font-family: var(--font);
+        font-size: 0.875rem;
+        color: var(--text);
+        transition: border-color 160ms, box-shadow 160ms;
+        outline: none;
+    }
+    .finput::placeholder, .ftextarea::placeholder { color: var(--text3); }
+    .finput:focus, .ftextarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+    }
+
+    .ftextarea { resize: vertical; min-height: 100px; }
+
+    .frow-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .form-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
+
+    .fsend {
+        flex: 1;
+        font-family: var(--font);
+        font-size: 0.875rem;
+        font-weight: 700;
+        padding: 0.7rem 1.25rem;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all 160ms;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        box-shadow: 0 2px 8px rgba(29,78,216,0.22);
+    }
+    .fsend:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(29,78,216,0.3); }
+
+    .fclear {
+        font-family: var(--font);
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.7rem 1rem;
+        background: transparent;
+        color: var(--text3);
+        border: 1px solid var(--border2);
+        border-radius: 7px;
+        cursor: pointer;
+        transition: all 160ms;
+    }
+    .fclear:hover { background: var(--bg2); color: var(--text2); }
+
+    .form-note {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--text3);
+        text-align: center;
+        margin-top: 0.75rem;
+    }
+
+    /* Thank-you card */
+    .thankyou-card {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2.5rem 1.5rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        animation: tyFadeIn 0.4s ease both;
+        box-shadow: var(--shadow);
+    }
+    @keyframes tyFadeIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .ty-icon-wrap {
+        width: 56px; height: 56px;
+        background: rgba(22,163,74,0.08);
+        border: 1.5px solid rgba(22,163,74,0.22);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        animation: tyPop 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
+    }
+    @keyframes tyPop {
+        from { transform: scale(0.5); opacity: 0; }
+        to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .ty-heading {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.3px;
+        margin-bottom: 0.5rem;
+    }
+
+    .ty-sub {
+        font-size: 0.875rem;
+        color: var(--text2);
+        line-height: 1.65;
+        max-width: 280px;
+        margin: 0 auto 1.5rem;
+    }
+
+    .ty-meta {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        color: var(--text3);
+        margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+        .contact-layout { grid-template-columns: 1fr; gap: 1.25rem; }
+        .frow-2 { grid-template-columns: 1fr; }
+        .contact-page { padding: 1.75rem 1.25rem 2.5rem; }
+        .contact-page-header { margin-bottom: 1.25rem; padding-bottom: 1rem; }
+    }
+
+    @media (max-width: 480px) {
+        .contact-page { padding: 1.25rem 1rem 2rem; }
+        .contact-page-header h1 { font-size: clamp(1.4rem, 8vw, 1.8rem); }
+        .contact-page-header p { font-size: 0.82rem; }
+        .contact-form-wrap { padding: 1.1rem; border-radius: 10px; }
+        .form-actions { flex-direction: column; gap: 0.5rem; }
+        .form-actions .btn-warm,
+        .form-actions .btn-outline { width: 100%; justify-content: center; }
+        .ci-row { padding: 0.6rem 0.75rem; gap: 0.6rem; }
+        .ci-icon { width: 28px; height: 28px; font-size: 0.85rem; flex-shrink: 0; }
+        .ci-label { font-size: 0.6rem; }
+        .ci-value { font-size: 0.82rem; }
+        .ftextarea { min-height: 85px; }
+        .fgroup { margin-bottom: 0.7rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="contact-page">
+    <div class="contact-page-inner">
+
+        <!-- Compact header -->
+        <div class="contact-page-header" data-aos="fade-up">
+            <span class="section-label">Get In Touch</span>
+            <h1>Contact Me</h1>
+            <p>Have a project, collaboration, or just want to say hello? I'd love to hear from you.</p>
+        </div>
+
+        <!-- Two-column layout -->
+        <div class="contact-layout">
+
+            <!-- LEFT: Info -->
+            <div data-aos="fade-right">
+                <p class="contact-info-heading">Let's work together.</p>
+                <p class="contact-info-sub">
+                    Available for freelance projects, full-time roles, and interesting collaborations — full-stack, AI/ML, deployment.
+                </p>
+
+                <div class="contact-items">
+                    <div class="ci-row">
+                        <div class="ci-icon"><i class="bi bi-envelope"></i></div>
+                        <div>
+                            <div class="ci-label">Email</div>
+                            <div class="ci-value">
+                                <a href="mailto:yunishachaulagain001@gmail.com">yunishachaulagain001@gmail.com</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ci-row">
+                        <div class="ci-icon"><i class="bi bi-github"></i></div>
+                        <div>
+                            <div class="ci-label">GitHub</div>
+                            <div class="ci-value">
+                                <a href="https://github.com/Unisha0" target="_blank">github.com/Unisha0</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ci-row">
+                        <div class="ci-icon"><i class="bi bi-linkedin"></i></div>
+                        <div>
+                            <div class="ci-label">LinkedIn</div>
+                            <div class="ci-value">
+                                <a href="https://www.linkedin.com/in/unisha-chaulagain/" target="_blank">unisha-chaulagain</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ci-row">
+                        <div class="ci-icon"><i class="bi bi-geo-alt"></i></div>
+                        <div>
+                            <div class="ci-label">Location</div>
+                            <div class="ci-value">Kathmandu, Nepal 🇳🇵</div>
+                        </div>
+                    </div>
+                    <div class="ci-row">
+                        <div class="ci-icon"><i class="bi bi-briefcase"></i></div>
+                        <div>
+                            <div class="ci-label">Availability</div>
+                            <div class="ci-value">
+                                Open to work —
+                                <a href="https://www.upwork.com/freelancers/~017f75e2248a9ab38e" target="_blank">Upwork →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-socials">
+                    <a href="https://github.com/Unisha0" target="_blank" class="contact-social-btn" title="GitHub"><i class="bi bi-github"></i></a>
+                    <a href="https://www.linkedin.com/in/unisha-chaulagain/" target="_blank" class="contact-social-btn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                    <a href="https://www.instagram.com/partofyune_sha/" target="_blank" class="contact-social-btn" title="Instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="mailto:yunishachaulagain001@gmail.com" class="contact-social-btn" title="Email"><i class="bi bi-envelope"></i></a>
+                </div>
+            </div>
+
+            <!-- RIGHT: Form -->
+            <div data-aos="fade-left">
+                <div class="contact-form-wrap" id="formWrap">
+                    <h3 class="form-title">Send a Message</h3>
+
+                    <form method="POST" action="{% url 'contact' %}" id="contactForm">
+                        {% csrf_token %}
+                        <div class="frow-2">
+                            <div class="fgroup">
+                                <label for="name" class="flabel">Full Name</label>
+                                <input type="text" id="name" name="name" class="finput" placeholder="Your name" required>
+                            </div>
+                            <div class="fgroup">
+                                <label for="email" class="flabel">Email</label>
+                                <input type="email" id="email" name="email" class="finput" placeholder="you@example.com" required>
+                            </div>
+                        </div>
+                        <div class="fgroup">
+                            <label for="subject" class="flabel">Subject</label>
+                            <input type="text" id="subject" name="subject" class="finput" placeholder="What's this about?" required>
+                        </div>
+                        <div class="fgroup">
+                            <label for="message" class="flabel">Message</label>
+                            <textarea id="message" name="message" class="ftextarea" placeholder="Tell me about your project, idea, or question..." required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="fsend" id="sendBtn">
+                                <i class="bi bi-send"></i> Send Message
+                            </button>
+                            <button type="reset" class="fclear">Clear</button>
+                        </div>
+                        <p class="form-note">I typically reply within 24 hours.</p>
+                    </form>
+                </div>
+
+                <!-- Thank-you card -->
+                <div class="thankyou-card" id="thankyouCard">
+                    <div class="ty-icon-wrap">✅</div>
+                    <h3 class="ty-heading">Thanks for your message!</h3>
+                    <p class="ty-sub">
+                        I received it and will get back to you within 24 hours. Looking forward to connecting!
+                    </p>
+                    <a href="/" class="btn-outline" style="font-size:0.82rem; padding:0.5rem 1.1rem;">
+                        <i class="bi bi-arrow-left"></i> Back to Home
+                    </a>
+                    <p class="ty-meta">— Unisha Chaulagain</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const btn  = document.getElementById('sendBtn');
+    const data = new FormData(form);
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Sending…';
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': data.get('csrfmiddlewaretoken') },
+        body: data
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === 'ok') {
+            document.getElementById('formWrap').style.display = 'none';
+            const ty = document.getElementById('thankyouCard');
+            ty.style.display = 'flex';
+        }
+    })
+    .catch(() => { form.submit(); });
+});
+</script>
+{% endblock %}

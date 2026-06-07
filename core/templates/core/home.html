@@ -1,0 +1,1155 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load i18n %}
+
+{% block title %}Unisha Chaulagain — Full-Stack Developer & AI/ML Engineer{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── HERO ── */
+    .hero {
+        padding: 1.75rem 1.5rem 2rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .hero::after {
+        content: '';
+        position: absolute;
+        top: -80px; right: -120px;
+        width: 580px; height: 580px;
+        background: radial-gradient(circle, rgba(29,78,216,0.05) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .hero-grid {
+        max-width: var(--max-w);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    /* ── PHOTO PORTRAIT ── */
+    .hero-photo-col {
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    /* Warm background plate — sits behind the photo */
+    .hero-photo-plate {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 88%;
+        height: 88%;
+        background: linear-gradient(160deg, #EEE9DF 0%, #E8E0D0 100%);
+        border-radius: 20px 20px 24px 24px;
+        z-index: 0;
+    }
+
+    /* Subtle blue accent blob — top right of plate */
+    .hero-photo-plate::after {
+        content: '';
+        position: absolute;
+        top: -20px; right: -20px;
+        width: 80px; height: 80px;
+        background: radial-gradient(circle, rgba(29,78,216,0.12) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .hero-photo-col img {
+        position: relative;
+        z-index: 1;
+        height: 510px;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        object-position: bottom center;
+        display: block;
+        filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12));
+        transition: transform 500ms ease;
+    }
+    .hero-photo-col:hover img { transform: translateY(-4px); }
+
+    /* "Open to work" badge — inline with eyebrow */
+    .otw-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.38rem;
+        background: rgba(22,163,74,0.09);
+        border: 1px solid rgba(22,163,74,0.22);
+        border-radius: 100px;
+        padding: 0.22rem 0.7rem;
+        font-family: var(--mono);
+        font-size: 0.62rem;
+        font-weight: 600;
+        color: #15803D;
+    }
+
+    .photo-status-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: #16A34A;
+        box-shadow: 0 0 6px rgba(22,163,74,0.7);
+        flex-shrink: 0;
+        animation: statusBlink 2s ease-in-out infinite;
+    }
+    @keyframes statusBlink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.5; }
+    }
+
+    /* ── HERO NAME (right column) ── */
+    .hero-name {
+        font-family: var(--serif);
+        font-size: clamp(3.2rem, 6.5vw, 5.2rem);
+        font-weight: 900;
+        line-height: 0.92;
+        letter-spacing: -3px;
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .hero-name .name-line2 {
+        display: block;
+        color: var(--accent);
+    }
+
+    /* ── HERO CONTENT (right column) ── */
+    .hero-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .hero-content-eyebrow {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    .hero-content-eyebrow::before {
+        content: '';
+        width: 22px; height: 2px;
+        background: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .hero-roles {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.1rem;
+    }
+
+    .role-tag {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.35rem 0.85rem;
+        border-radius: 100px;
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        color: var(--text2);
+    }
+    .role-tag.hot {
+        background: var(--accent-bg);
+        border-color: rgba(29,78,216,0.22);
+        color: var(--accent);
+    }
+
+    .hero-bio {
+        font-size: 0.9rem;
+        color: var(--text2);
+        line-height: 1.7;
+        margin-bottom: 1.1rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.25rem;
+    }
+
+    .hero-contacts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+    }
+
+    .hero-contact-link {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--text3);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: color 180ms;
+    }
+    .hero-contact-link:hover { color: var(--accent); }
+
+    /* ── WHAT I DO ── */
+    .identity-section {
+        padding: 2rem 1.5rem 2.25rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+    }
+
+    .identity-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    .identity-header { margin-bottom: 1.25rem; }
+
+    /* identity grid */
+    .identity-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+        align-items: stretch;
+    }
+
+    /* ══ UNIFIED DARK IDENTITY CARDS ══ */
+    .id-card {
+        background: #0B0B0F;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 420px;
+        transition: border-color 250ms, box-shadow 250ms;
+    }
+    .id-card:hover {
+        border-color: rgba(255,255,255,0.14);
+        box-shadow: 0 12px 48px rgba(0,0,0,0.45);
+    }
+    /* ── Card shared body/visual zones ── */
+    .id-card-visual {
+        flex: 1;
+        padding: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        min-height: 210px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .id-card-body {
+        padding: 1.1rem 1.25rem 1.25rem;
+        border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .id-card-eyebrow {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        color: rgba(255,255,255,0.28);
+        margin-bottom: 0.35rem;
+    }
+    .id-card-title {
+        font-family: var(--serif);
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #F0F0F4;
+        letter-spacing: -0.4px;
+        line-height: 1.2;
+        margin-bottom: 0.45rem;
+    }
+    .id-card-desc {
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.35);
+        line-height: 1.6;
+        margin-bottom: 0.85rem;
+    }
+    .id-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+    .id-tag {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        font-weight: 500;
+        padding: 0.18rem 0.5rem;
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.4);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 4px;
+    }
+
+    /* ── CARD 1: FULL-STACK — Floating layer stack ── */
+    .stack-layer {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.6rem 0.85rem;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 8px;
+        margin-bottom: 0.45rem;
+        cursor: default;
+        transition: background 200ms;
+        animation: layerIn 0.4s ease both, layerFloat 5s ease-in-out infinite;
+    }
+    .stack-layer:last-child { margin-bottom: 0; }
+    .stack-layer:hover { background: rgba(255,255,255,0.07); }
+    .stack-layer:nth-child(1) { animation-delay: 0.05s, 0s; }
+    .stack-layer:nth-child(2) { animation-delay: 0.15s, 1.2s; }
+    .stack-layer:nth-child(3) { animation-delay: 0.25s, 2.4s; }
+    .stack-layer:nth-child(4) { animation-delay: 0.35s, 3.6s; }
+    @keyframes layerIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes layerFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .stack-icon {
+        width: 28px; height: 28px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; flex-shrink: 0;
+    }
+    .stack-info { flex: 1; min-width: 0; }
+    .stack-name {
+        font-family: var(--font);
+        font-size: 0.75rem; font-weight: 700;
+        color: rgba(255,255,255,0.82);
+        margin-bottom: 3px;
+    }
+    .stack-chips { display: flex; gap: 3px; flex-wrap: wrap; }
+    .stack-chip {
+        font-family: var(--mono);
+        font-size: 0.55rem; padding: 1px 5px;
+        background: rgba(255,255,255,0.05);
+        color: rgba(255,255,255,0.38);
+        border-radius: 3px;
+    }
+    .stack-dot {
+        width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+        animation: dotPulse 2s ease-in-out infinite;
+    }
+    .stack-layer:nth-child(1) .stack-dot { background: rgba(74,222,128,0.7); animation-delay: 0s; }
+    .stack-layer:nth-child(2) .stack-dot { background: rgba(96,165,250,0.7); animation-delay: 0.5s; }
+    .stack-layer:nth-child(3) .stack-dot { background: rgba(251,191,36,0.7); animation-delay: 1s; }
+    .stack-layer:nth-child(4) .stack-dot { background: rgba(192,132,252,0.7); animation-delay: 1.5s; }
+    @keyframes dotPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ── CARD 2: AI/ML — Live metric bars ── */
+    .ai-header {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    .ai-status {
+        display: flex; align-items: center; gap: 5px;
+        font-family: var(--mono); font-size: 0.6rem;
+        color: rgba(255,255,255,0.3);
+    }
+    .ai-status-dot {
+        width: 5px; height: 5px; border-radius: 50%;
+        background: rgba(74,222,128,0.75);
+        animation: aiDot 1.2s ease-in-out infinite;
+    }
+    @keyframes aiDot { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+    .ai-epoch { font-family: var(--mono); font-size: 0.58rem; color: rgba(255,255,255,0.18); }
+    .ai-metric { margin-bottom: 0.65rem; }
+    .ai-metric:last-of-type { margin-bottom: 0; }
+    .ai-metric-row {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 4px;
+    }
+    .ai-label {
+        font-family: var(--mono); font-size: 0.6rem;
+        color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .ai-value {
+        font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+        color: rgba(255,255,255,0.7);
+    }
+    .ai-track {
+        height: 3px; background: rgba(255,255,255,0.06);
+        border-radius: 100px; overflow: hidden;
+    }
+    .ai-fill {
+        height: 100%; border-radius: 100px;
+        animation: aiFill 1.8s ease-out both;
+    }
+    @keyframes aiFill { from { width: 0% !important; } }
+    .ai-fill-acc  { background: linear-gradient(90deg, rgba(74,222,128,0.4), rgba(74,222,128,0.85)); animation-delay: 0.2s; }
+    .ai-fill-loss { background: linear-gradient(90deg, rgba(96,165,250,0.4), rgba(96,165,250,0.85)); animation-delay: 0.4s; }
+    .ai-fill-f1   { background: linear-gradient(90deg, rgba(192,132,252,0.4), rgba(192,132,252,0.85)); animation-delay: 0.6s; }
+    .ai-fill-prec { background: linear-gradient(90deg, rgba(251,191,36,0.4), rgba(251,191,36,0.85)); animation-delay: 0.8s; }
+    .ai-framework-row {
+        display: flex; gap: 5px; flex-wrap: wrap; margin-top: 0.9rem;
+    }
+    .ai-fw {
+        font-family: var(--mono); font-size: 0.58rem; padding: 2px 7px;
+        border: 1px solid rgba(255,255,255,0.09); border-radius: 100px;
+        color: rgba(255,255,255,0.35);
+        animation: fwIn 0.4s ease both;
+    }
+    .ai-fw:nth-child(1){animation-delay:.1s} .ai-fw:nth-child(2){animation-delay:.2s}
+    .ai-fw:nth-child(3){animation-delay:.3s} .ai-fw:nth-child(4){animation-delay:.4s}
+    .ai-fw:nth-child(5){animation-delay:.5s}
+    @keyframes fwIn { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+
+    /* ── CARD 3: DEPLOY — Terminal output ── */
+    .term-bar {
+        display: flex; align-items: center; gap: 6px;
+        padding: 7px 12px;
+        background: rgba(0,0,0,0.35);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        flex-shrink: 0;
+    }
+    .term-btn { width: 8px; height: 8px; border-radius: 50%; }
+    .term-btn-r { background: rgba(255,95,87,0.55); }
+    .term-btn-y { background: rgba(255,189,46,0.55); }
+    .term-btn-g { background: rgba(40,202,65,0.55); }
+    .term-title-bar {
+        flex: 1; text-align: center;
+        font-family: var(--mono); font-size: 0.58rem;
+        color: rgba(255,255,255,0.18);
+    }
+    .term-body {
+        padding: 0.85rem 1rem;
+        font-family: var(--mono); font-size: 0.68rem;
+        flex: 1;
+        display: flex; flex-direction: column; gap: 4px;
+    }
+    .term-line {
+        display: flex; align-items: baseline; gap: 7px;
+        animation: termIn 0.15s ease both;
+    }
+    .term-line:nth-child(1){animation-delay:.1s} .term-line:nth-child(2){animation-delay:.55s}
+    .term-line:nth-child(3){animation-delay:1s}  .term-line:nth-child(4){animation-delay:1.45s}
+    .term-line:nth-child(5){animation-delay:1.9s} .term-line:nth-child(6){animation-delay:2.35s}
+    .term-line:nth-child(7){animation-delay:2.8s}
+    @keyframes termIn { from { opacity:0; } to { opacity:1; } }
+    .t-prompt { color: rgba(74,222,128,0.65); flex-shrink: 0; }
+    .t-cmd    { color: rgba(255,255,255,0.55); }
+    .t-ok     { color: rgba(74,222,128,0.8); flex-shrink: 0; }
+    .t-info   { color: rgba(96,165,250,0.65); }
+    .t-dim    { color: rgba(255,255,255,0.2); font-size: 0.6rem; }
+    .t-cursor {
+        display: inline-block; width: 6px; height: 10px;
+        background: rgba(255,255,255,0.45);
+        animation: cur 1s step-end infinite; vertical-align: middle;
+    }
+    @keyframes cur { 0%,100%{opacity:1} 50%{opacity:0} }
+    .term-statusbar {
+        display: flex; align-items: center; gap: 6px;
+        padding: 5px 12px;
+        background: rgba(0,0,0,0.3);
+        border-top: 1px solid rgba(255,255,255,0.05);
+        font-family: var(--mono); font-size: 0.58rem;
+        color: rgba(255,255,255,0.22);
+        flex-shrink: 0;
+    }
+    .term-status-dot {
+        width: 5px; height: 5px; border-radius: 50%;
+        background: rgba(74,222,128,0.7);
+        animation: cur 1s step-end infinite;
+    }
+
+    /* ── SKILLS ── */
+    .skills-section {
+        padding: 2rem 1.5rem 2.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg2);
+    }
+
+    .skills-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    .skills-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 1.25rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .skill-card {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem 0.6rem 0.9rem;
+        text-align: center;
+        transition: all 200ms;
+        cursor: default;
+    }
+
+    .skill-card:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(29,78,216,0.1), var(--shadow);
+        transform: translateY(-4px);
+    }
+
+    .skill-card img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto 0.5rem;
+    }
+
+    .skill-name {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text2);
+    }
+
+    /* ── PROJECTS ── */
+    .projects-section {
+        padding: 2rem 1.5rem 2.5rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+    }
+
+    .projects-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    .section-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .proj-card {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        transition: all 200ms;
+    }
+
+    .proj-card:hover {
+        border-color: var(--border2);
+        box-shadow: var(--shadow);
+        transform: translateY(-4px);
+    }
+
+    .proj-cat {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--accent);
+        margin-bottom: 0.65rem;
+    }
+
+    .proj-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.65rem;
+        letter-spacing: -0.3px;
+    }
+
+    .proj-desc {
+        font-size: 0.875rem;
+        color: var(--text2);
+        line-height: 1.7;
+        margin-bottom: 1.25rem;
+        flex: 1;
+    }
+
+    .tech-row {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.25rem;
+    }
+
+    .tech-chip {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 0.25rem 0.55rem;
+        background: var(--bg2);
+        color: var(--text3);
+        border-radius: 4px;
+        border: 1px solid var(--border);
+    }
+
+    .proj-links { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+    .lbtn {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.45rem 0.85rem;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: all 200ms;
+    }
+
+    .lbtn-gh {
+        background: var(--bg2);
+        color: var(--text2);
+        border: 1.5px solid var(--border2);
+    }
+    .lbtn-gh:hover { background: var(--text); color: #fff; border-color: var(--text); }
+
+    .lbtn-live {
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1.5px solid rgba(29,78,216,0.2);
+    }
+    .lbtn-live:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .no-proj-msg {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 4rem 1.5rem;
+        color: var(--text3);
+        font-size: 0.95rem;
+    }
+
+    /* ── CONTACT CTA ── */
+    .cta-section {
+        padding: 2.25rem 1.5rem;
+        background: var(--bg2);
+        text-align: center;
+    }
+
+    .cta-inner { max-width: 680px; margin: 0 auto; }
+
+    .cta-inner h2 {
+        font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.8px;
+        margin-bottom: 0.6rem;
+    }
+
+    .cta-inner p {
+        font-size: 0.92rem;
+        color: var(--text2);
+        margin-bottom: 1.5rem;
+        line-height: 1.7;
+    }
+
+    .cta-contacts {
+        display: flex;
+        justify-content: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-contact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--text2);
+        padding: 0.5rem 0.9rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        text-decoration: none;
+        transition: all 160ms;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .cta-contact-item:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── RESPONSIVE: TABLET ── */
+    @media (max-width: 960px) {
+        .hero-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+        .hero-photo-col img { height: 360px; }
+        .hero-photo-plate { width: 86%; height: 84%; }
+        .hero-name { font-size: clamp(2.8rem, 8vw, 4rem); letter-spacing: -2px; }
+        .identity-cards { grid-template-columns: 1fr; gap: 1rem; }
+        .id-card { min-height: 370px; flex-direction: row; }
+        .id-card-visual { min-height: unset; flex: 1.2; }
+        .id-card-body { flex: 1; border-top: none; border-left: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; justify-content: center; }
+        .skills-top { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+        .skills-top p { text-align: left; max-width: 100%; }
+    }
+
+    /* ── RESPONSIVE: MOBILE ── */
+    @media (max-width: 640px) {
+        /* Hero */
+        .hero { padding: 1.1rem 1rem 1.4rem; }
+        .hero-grid { gap: 0.85rem; }
+        .hero-photo-col img { height: 220px; }
+        .hero-photo-plate { width: 90%; height: 76%; border-radius: 12px 12px 16px 16px; }
+        .hero-content-eyebrow { font-size: 0.58rem; letter-spacing: 1.5px; gap: 0.45rem; margin-bottom: 0.75rem; }
+        .hero-name { font-size: clamp(2.6rem, 13vw, 3.6rem); letter-spacing: -2px; margin-bottom: 0.75rem; }
+        .hero-roles { gap: 0.35rem; margin-bottom: 0.85rem; }
+        .role-tag { font-size: 0.72rem; padding: 0.28rem 0.65rem; }
+        .hero-bio { font-size: 0.82rem; line-height: 1.65; margin-bottom: 0.85rem; }
+        .hero-actions { flex-direction: column; gap: 0.45rem; margin-bottom: 1rem; }
+        .hero-actions .btn-warm,
+        .hero-actions .btn-outline { width: 100%; justify-content: center; padding: 0.65rem 1rem; }
+        .hero-contacts { gap: 0.65rem; }
+        .hero-contact-link { font-size: 0.68rem; }
+
+        /* Identity */
+        .identity-section { padding: 1.4rem 1rem 1.6rem; }
+        .identity-cards { grid-template-columns: 1fr; flex-direction: column; gap: 0.75rem; }
+        .id-card { min-height: unset; flex-direction: column; }
+        .id-card-visual { min-height: 180px; padding: 1rem; }
+        .id-card-body { border-top: 1px solid rgba(255,255,255,0.06); border-left: none; padding: 0.9rem 1rem 1rem; }
+
+        /* Skills */
+        .skills-section { padding: 1.4rem 1rem 1.6rem; }
+        .skills-top { gap: 0.4rem; margin-bottom: 1rem; }
+        .skills-top p { font-size: 0.8rem; }
+        .skills-grid { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 0.4rem; }
+        .skill-card { padding: 0.7rem 0.3rem 0.55rem; border-radius: 8px; }
+        .skill-card img { width: 26px; height: 26px; margin-bottom: 0.35rem; }
+        .skill-name { font-size: 0.64rem; }
+
+        /* Projects */
+        .projects-section { padding: 1.4rem 1rem 1.6rem; }
+        .projects-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+        .proj-card { padding: 1rem; }
+        .section-top { margin-bottom: 1rem; }
+
+        /* CTA */
+        .cta-section { padding: 1.6rem 1rem; }
+        .cta-inner h2 { font-size: clamp(1.2rem, 6vw, 1.6rem); }
+        .cta-contacts { flex-direction: column; align-items: stretch; gap: 0.45rem; }
+        .cta-contact-item { justify-content: center; font-size: 0.7rem; padding: 0.45rem 0.75rem; }
+    }
+
+    /* ── RESPONSIVE: SMALL MOBILE ── */
+    @media (max-width: 380px) {
+        .hero-name { font-size: clamp(2.3rem, 14vw, 3rem); }
+        .hero-photo-col img { height: 190px; }
+        .skills-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 0.35rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ── -->
+<section class="hero" id="hero">
+    <div class="hero-grid">
+
+        <!-- LEFT: Portrait photo with warm plate -->
+        <div class="hero-photo-col" data-aos="fade-right">
+            <div class="hero-photo-plate"></div>
+            <img src="/media/uploads/unisha%20photo.png"
+                 alt="Unisha Chaulagain — Full-Stack Developer & AI/ML Engineer">
+        </div>
+
+        <!-- RIGHT: Bold name + content -->
+        <div class="hero-content" data-aos="fade-left">
+            <div class="hero-content-eyebrow">
+                Full-Stack Developer &amp; AI/ML Engineer
+                <span class="otw-badge"><span class="photo-status-dot"></span> Open to work</span>
+            </div>
+
+            <h1 class="hero-name">
+                UNISHA
+                <span class="name-line2">CHAULAGAIN</span>
+            </h1>
+
+            <div class="hero-roles">
+                <span class="role-tag hot">Full-Stack Dev</span>
+                <span class="role-tag hot">AI / ML</span>
+                <span class="role-tag">Django</span>
+                <span class="role-tag">PyTorch</span>
+                <span class="role-tag">Deployer</span>
+                <span class="role-tag">🇳🇵 Nepal</span>
+            </div>
+
+            <p class="hero-bio">
+                I am a Full-Stack Developer and AI Engineer passionate about creating technology that makes a meaningful impact. My expertise spans software development, machine learning, cloud infrastructure, and product design, allowing me to transform ambitious ideas into fully functional digital experiences. 
+                Whether it's a business platform, an AI solution, or a custom web application, I focus on building products that are elegant, scalable, and built to last.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/projects/" class="btn-warm">
+                    <i class="bi bi-folder2-open"></i> See My Projects
+                </a>
+                {% if cv_url %}
+                <a href="{{ cv_url }}" target="_blank" class="btn-outline">
+                    <i class="bi bi-download"></i> Download CV
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="hero-contacts">
+                <a href="mailto:yunishachaulagain001@gmail.com" class="hero-contact-link">
+                    <i class="bi bi-envelope"></i> yunishachaulagain001@gmail.com
+                </a>
+                <a href="https://github.com/Unisha0" target="_blank" class="hero-contact-link">
+                    <i class="bi bi-github"></i> Unisha0
+                </a>
+                <a href="https://www.linkedin.com/in/unisha-chaulagain/" target="_blank" class="hero-contact-link">
+                    <i class="bi bi-linkedin"></i> LinkedIn
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ── WHAT I DO ── -->
+<section class="identity-section" id="about">
+    <div class="identity-inner">
+        <div class="identity-header" data-aos="fade-up">
+            <span class="section-label">What I Do</span>
+            <h2 class="section-title">I develop. I deploy.<br>I do AI/ML.</h2>
+        </div>
+        <div class="identity-cards">
+
+            <!-- CARD 1: FULL-STACK DEVELOPER -->
+            <div class="id-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="id-card-visual">
+                    <div class="stack-layer">
+                        <div class="stack-icon">🎨</div>
+                        <div class="stack-info">
+                            <div class="stack-name">Frontend</div>
+                            <div class="stack-chips">
+                                <span class="stack-chip">React</span>
+                                <span class="stack-chip">JavaScript</span>
+                                <span class="stack-chip">HTML/CSS</span>
+                            </div>
+                        </div>
+                        <div class="stack-dot"></div>
+                    </div>
+                    <div class="stack-layer">
+                        <div class="stack-icon">⚙️</div>
+                        <div class="stack-info">
+                            <div class="stack-name">Backend</div>
+                            <div class="stack-chips">
+                                <span class="stack-chip">Django</span>
+                                <span class="stack-chip">DRF</span>
+                                <span class="stack-chip">Python</span>
+                            </div>
+                        </div>
+                        <div class="stack-dot"></div>
+                    </div>
+                    <div class="stack-layer">
+                        <div class="stack-icon">🗄️</div>
+                        <div class="stack-info">
+                            <div class="stack-name">Database</div>
+                            <div class="stack-chips">
+                                <span class="stack-chip">PostgreSQL</span>
+                                <span class="stack-chip">SQLite</span>
+                            </div>
+                        </div>
+                        <div class="stack-dot"></div>
+                    </div>
+                    <div class="stack-layer">
+                        <div class="stack-icon">🚀</div>
+                        <div class="stack-info">
+                            <div class="stack-name">Deploy</div>
+                            <div class="stack-chips">
+                                <span class="stack-chip">Docker</span>
+                                <span class="stack-chip">AWS</span>
+                                <span class="stack-chip">VPS</span>
+                            </div>
+                        </div>
+                        <div class="stack-dot"></div>
+                    </div>
+                </div>
+                <div class="id-card-body">
+                    <div class="id-card-eyebrow">01 — Full-Stack</div>
+                    <div class="id-card-title">Full-Stack Developer</div>
+                    <div class="id-card-desc">Schema to UI to production — solo, end-to-end.</div>
+                    <div class="id-tags">
+                        <span class="id-tag">Django</span>
+                        <span class="id-tag">React</span>
+                        <span class="id-tag">PostgreSQL</span>
+                        <span class="id-tag">REST API</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2: AI/ML ENGINEER -->
+            <div class="id-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="id-card-visual">
+                    <div class="ai-header">
+                        <div class="ai-status">
+                            <div class="ai-status-dot"></div>
+                            TRAINING
+                        </div>
+                        <div class="ai-epoch">epoch 48 / 50</div>
+                    </div>
+                    <div class="ai-metric">
+                        <div class="ai-metric-row">
+                            <span class="ai-label">Accuracy</span>
+                            <span class="ai-value">94.2%</span>
+                        </div>
+                        <div class="ai-track"><div class="ai-fill ai-fill-acc" style="width:94%"></div></div>
+                    </div>
+                    <div class="ai-metric">
+                        <div class="ai-metric-row">
+                            <span class="ai-label">Val Loss</span>
+                            <span class="ai-value">0.031</span>
+                        </div>
+                        <div class="ai-track"><div class="ai-fill ai-fill-loss" style="width:97%"></div></div>
+                    </div>
+                    <div class="ai-metric">
+                        <div class="ai-metric-row">
+                            <span class="ai-label">F1 Score</span>
+                            <span class="ai-value">0.912</span>
+                        </div>
+                        <div class="ai-track"><div class="ai-fill ai-fill-f1" style="width:91%"></div></div>
+                    </div>
+                    <div class="ai-metric">
+                        <div class="ai-metric-row">
+                            <span class="ai-label">Precision</span>
+                            <span class="ai-value">0.887</span>
+                        </div>
+                        <div class="ai-track"><div class="ai-fill ai-fill-prec" style="width:88%"></div></div>
+                    </div>
+                    <div class="ai-framework-row">
+                        <span class="ai-fw">PyTorch</span>
+                        <span class="ai-fw">TensorFlow</span>
+                        <span class="ai-fw">scikit-learn</span>
+                        <span class="ai-fw">Pandas</span>
+                        <span class="ai-fw">NLP</span>
+                    </div>
+                </div>
+                <div class="id-card-body">
+                    <div class="id-card-eyebrow">02 — AI / ML</div>
+                    <div class="id-card-title">AI / ML Engineer</div>
+                    <div class="id-card-desc">Train, evaluate, and deploy models that actually work in production.</div>
+                    <div class="id-tags">
+                        <span class="id-tag">PyTorch</span>
+                        <span class="id-tag">TensorFlow</span>
+                        <span class="id-tag">NLP</span>
+                        <span class="id-tag">Deep Learning</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 3: DEPLOY & SHIP -->
+            <div class="id-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="id-card-visual" style="padding:0; display:flex; flex-direction:column;">
+                    <div class="term-bar">
+                        <div class="term-btn term-btn-r"></div>
+                        <div class="term-btn term-btn-y"></div>
+                        <div class="term-btn term-btn-g"></div>
+                        <div class="term-title-bar">unisha@prod — bash</div>
+                    </div>
+                    <div class="term-body">
+                        <div class="term-line">
+                            <span class="t-prompt">$</span>
+                            <span class="t-cmd">git push origin main</span>
+                        </div>
+                        <div class="term-line">
+                            <span class="t-ok">✓</span>
+                            <span class="t-info">CI pipeline triggered</span>
+                        </div>
+                        <div class="term-line">
+                            <span class="t-ok">✓</span>
+                            <span class="t-info">Tests passed (47/47)</span>
+                        </div>
+                        <div class="term-line">
+                            <span class="t-ok">✓</span>
+                            <span class="t-info">Docker image built — 1.4s</span>
+                        </div>
+                        <div class="term-line">
+                            <span class="t-ok">✓</span>
+                            <span class="t-info">Pushed to registry</span>
+                        </div>
+                        <div class="term-line">
+                            <span class="t-ok">✓</span>
+                            <span class="t-info">Rolling deploy complete</span>
+                        </div>
+                        <div class="term-line">
+                            <span class="t-prompt">$</span>
+                            <span class="t-dim">3/3 containers healthy</span>
+                            <span class="t-cursor"></span>
+                        </div>
+                    </div>
+                    <div class="term-statusbar">
+                        <div class="term-status-dot"></div>
+                        ALL SYSTEMS OPERATIONAL · uptime 99.9%
+                    </div>
+                </div>
+                <div class="id-card-body">
+                    <div class="id-card-eyebrow">03 — DevOps</div>
+                    <div class="id-card-title">Deploy & Ship</div>
+                    <div class="id-card-desc">Zero handoff — I build it, containerise it, and push it live myself.</div>
+                    <div class="id-tags">
+                        <span class="id-tag">Docker</span>
+                        <span class="id-tag">AWS</span>
+                        <span class="id-tag">Nginx</span>
+                        <span class="id-tag">CI/CD</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ── SKILLS ── -->
+<section class="skills-section" id="skills">
+    <div class="skills-inner">
+        <div class="skills-top" data-aos="fade-up">
+            <div>
+                <span class="section-label">Tech Stack</span>
+                <h2 class="section-title">Skills & Tools</h2>
+            </div>
+            <p style="font-size:0.875rem; color:var(--text2); max-width:280px; text-align:right; line-height:1.6; font-style:italic;">
+                These are the tools I actually live in , from writing APIs to training models to pushing containers live.
+            </p>
+        </div>
+
+        <div class="skills-grid" data-aos="fade-up" data-aos-delay="80">
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/python.svg' %}" alt="Python">
+                <div class="skill-name">Python</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/django.svg' %}" alt="Django">
+                <div class="skill-name">Django</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/pytorch.svg' %}" alt="PyTorch">
+                <div class="skill-name">PyTorch</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/tensorflow.svg' %}" alt="TensorFlow">
+                <div class="skill-name">TensorFlow</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/react.svg' %}" alt="React">
+                <div class="skill-name">React</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/javascript.svg' %}" alt="JavaScript">
+                <div class="skill-name">JavaScript</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/postgresql.svg' %}" alt="PostgreSQL">
+                <div class="skill-name">PostgreSQL</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/sql.svg' %}" alt="SQL">
+                <div class="skill-name">SQL</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/docker.svg' %}" alt="Docker">
+                <div class="skill-name">Docker</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/aws.svg' %}" alt="AWS">
+                <div class="skill-name">AWS</div>
+            </div>
+            <div class="skill-card">
+                <img src="{% static 'core/images/skills/git.svg' %}" alt="Git">
+                <div class="skill-name">Git</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FEATURED PROJECTS ── -->
+<section class="projects-section" id="projects">
+    <div class="projects-inner">
+        <div class="section-top" data-aos="fade-up">
+            <div>
+                <span class="section-label">Featured Work</span>
+                <h2 class="section-title">Projects</h2>
+            </div>
+            <a href="/projects/" class="btn-outline" style="font-size:0.85rem; padding:0.55rem 1.1rem;">
+                All Projects <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="projects-grid">
+            {% if featured_projects %}
+                {% for project in featured_projects %}
+                <div class="proj-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|mul:80 }}">
+                    <div class="proj-cat">{{ project.get_category_display }}</div>
+                    <h3 class="proj-title">{{ project.title }}</h3>
+                    <p class="proj-desc">{{ project.description|truncatewords:25 }}</p>
+                    <div class="tech-row">
+                        {% for tech in project.get_tech_list %}
+                        <span class="tech-chip">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="proj-links">
+                        {% if project.github_url %}
+                        <a href="{{ project.github_url }}" target="_blank" rel="noopener" class="lbtn lbtn-gh">
+                            <i class="bi bi-github"></i> GitHub
+                        </a>
+                        {% endif %}
+                        {% if project.live_url %}
+                        <a href="{{ project.live_url }}" target="_blank" rel="noopener" class="lbtn lbtn-live">
+                            <i class="bi bi-box-arrow-up-right"></i> Live
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-proj-msg">
+                    <p>Add featured projects in the <a href="/admin/">admin panel</a>.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ── CONTACT CTA ── -->
+<section class="cta-section" id="contact">
+    <div class="cta-inner" data-aos="fade-up">
+        <span class="section-label">Get In Touch</span>
+        <h2>Let's Build Something Together</h2>
+        <p>
+            Have an AI/ML project? Need a full-stack developer who actually deploys?<br>
+            Available for freelance work, full-time roles, and interesting collaborations.
+        </p>
+        <div class="cta-contacts">
+            <a href="mailto:yunishachaulagain001@gmail.com" class="cta-contact-item">
+                <i class="bi bi-envelope"></i> yunishachaulagain001@gmail.com
+            </a>
+            <a href="https://github.com/Unisha0" target="_blank" class="cta-contact-item">
+                <i class="bi bi-github"></i> github.com/Unisha0
+            </a>
+            <a href="https://www.linkedin.com/in/unisha-chaulagain/" target="_blank" class="cta-contact-item">
+                <i class="bi bi-linkedin"></i> unisha-chaulagain
+            </a>
+        </div>
+        <a href="/contact/" class="btn-warm">
+            <i class="bi bi-send"></i> Send a Message
+        </a>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

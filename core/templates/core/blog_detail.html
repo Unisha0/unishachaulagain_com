@@ -1,0 +1,729 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ post.title }} — Unisha Chaulagain{% endblock %}
+
+{% block extra_css %}
+<style>
+    .post-hero {
+        padding: 2.25rem 1.5rem 1.75rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+    }
+
+    .post-hero-inner {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .post-date {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text3);
+        margin-bottom: 1rem;
+    }
+
+    .post-title {
+        font-family: var(--serif);
+        font-size: clamp(1.75rem, 5vw, 3rem);
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--text);
+        letter-spacing: -0.5px;
+        margin-bottom: 1.25rem;
+    }
+
+    .post-meta {
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text3);
+        margin-bottom: 1.5rem;
+    }
+
+    .post-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    .post-tag {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        font-weight: 600;
+        padding: 0.3rem 0.65rem;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border-radius: 100px;
+        border: 1px solid rgba(29,78,216,0.28);
+    }
+
+    .post-cover {
+        max-width: 760px;
+        margin: 1.75rem auto;
+        padding: 0 1.5rem;
+    }
+
+    .post-cover img {
+        width: 100%;
+        max-height: 420px;
+        object-fit: cover;
+        border-radius: 14px;
+        border: 1.5px solid var(--border);
+    }
+
+    /* Content layout */
+    .post-layout {
+        max-width: var(--max-w);
+        margin: 0 auto;
+        padding: 2rem 1.5rem 3.5rem;
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        gap: 2.5rem;
+        align-items: start;
+    }
+
+    /* Article content styles */
+    .post-content {
+        font-family: var(--serif);
+        font-size: 1.05rem;
+        color: var(--text);
+        line-height: 1.85;
+    }
+
+    .post-content h1, .post-content h2, .post-content h3,
+    .post-content h4, .post-content h5, .post-content h6 {
+        font-family: var(--font);
+        color: var(--text);
+        margin-top: 2.5rem;
+        margin-bottom: 0.9rem;
+        letter-spacing: -0.3px;
+        line-height: 1.25;
+    }
+
+    .post-content h1 { font-size: 1.9rem; }
+    .post-content h2 { font-size: 1.55rem; }
+    .post-content h3 { font-size: 1.25rem; }
+
+    .post-content p { margin-bottom: 1.4rem; }
+
+    .post-content ul, .post-content ol {
+        margin: 0 0 1.4rem 1.75rem;
+    }
+
+    .post-content li { margin-bottom: 0.6rem; }
+
+    .post-content blockquote {
+        border-left: 3px solid var(--accent);
+        padding: 0.5rem 0 0.5rem 1.5rem;
+        margin: 1.75rem 0;
+        color: var(--text2);
+        font-style: italic;
+    }
+
+    .post-content code {
+        font-family: var(--mono);
+        font-size: 0.875em;
+        background: var(--bg2);
+        color: var(--accent);
+        padding: 0.15em 0.45em;
+        border-radius: 4px;
+        border: 1px solid var(--border);
+    }
+
+    .post-content pre {
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem 1.5rem;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+    }
+
+    .post-content pre code {
+        background: none;
+        border: none;
+        padding: 0;
+        color: var(--text);
+        font-size: 0.875rem;
+    }
+
+    .post-content img {
+        max-width: 100%;
+        border-radius: 10px;
+        border: 1.5px solid var(--border);
+        margin: 1.5rem 0;
+    }
+
+    .post-content a {
+        color: var(--accent);
+        text-decoration: underline;
+        text-decoration-color: rgba(29,78,216,0.35);
+    }
+    .post-content a:hover { text-decoration-color: var(--accent); }
+
+    .post-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.9rem;
+    }
+    .post-content th { background: var(--bg2); font-family: var(--font); font-weight: 700; }
+    .post-content th, .post-content td {
+        padding: 0.75rem 1rem;
+        border: 1.5px solid var(--border);
+        text-align: left;
+    }
+
+    /* ── Like button ── */
+    .like-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 2.5rem 0 0;
+        padding-top: 2rem;
+        border-top: 1.5px solid var(--border);
+    }
+
+    .like-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.3rem;
+        border-radius: 100px;
+        border: 1.5px solid var(--border);
+        background: var(--bg2);
+        color: var(--text2);
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 200ms;
+        user-select: none;
+    }
+    .like-btn:hover { border-color: #f43f5e; color: #f43f5e; background: rgba(244,63,94,0.06); }
+    .like-btn.liked  { border-color: #f43f5e; color: #f43f5e; background: rgba(244,63,94,0.08); }
+    .like-btn .heart { font-size: 1rem; transition: transform 250ms cubic-bezier(0.34,1.56,0.64,1); }
+    .like-btn.liked .heart,
+    .like-btn:active .heart { transform: scale(1.35); }
+
+    .like-note {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text3);
+    }
+
+    /* ── Comments ── */
+    .comments-section {
+        margin-top: 2rem;
+        padding-top: 1.75rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .comments-heading {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .comment-count-badge {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 700;
+        background: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid rgba(29,78,216,0.28);
+        border-radius: 100px;
+        padding: 0.15rem 0.6rem;
+    }
+
+    /* Individual comment */
+    .comment-item {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        animation: cmtIn 0.35s ease both;
+    }
+    @keyframes cmtIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    .comment-avatar {
+        width: 38px; height: 38px;
+        border-radius: 50%;
+        background: var(--accent-bg);
+        border: 1.5px solid rgba(29,78,216,0.28);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--accent);
+        flex-shrink: 0;
+        text-transform: uppercase;
+    }
+
+    .comment-bubble {
+        flex: 1;
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+    }
+
+    .comment-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .comment-name {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .comment-date {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        color: var(--text3);
+    }
+
+    .comment-body {
+        font-size: 0.9rem;
+        color: var(--text2);
+        line-height: 1.7;
+    }
+
+    /* Comment form */
+    .comment-form-wrap {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem;
+        margin-top: 1.25rem;
+    }
+
+    .comment-form-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1.25rem;
+    }
+
+    .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .cf-group { margin-bottom: 0.75rem; }
+    .cf-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text2); margin-bottom: 0.35rem; }
+    .cf-input, .cf-textarea {
+        width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+        border-radius: 8px; padding: 0.7rem 0.9rem;
+        font-family: var(--font); font-size: 0.9rem; color: var(--text);
+        outline: none; transition: border-color 180ms, box-shadow 180ms;
+    }
+    .cf-input::placeholder, .cf-textarea::placeholder { color: var(--text3); }
+    .cf-input:focus, .cf-textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(29,78,216,0.12);
+    }
+    .cf-textarea { resize: vertical; min-height: 100px; }
+
+    .cf-submit {
+        font-family: var(--font); font-size: 0.9rem; font-weight: 700;
+        padding: 0.7rem 1.5rem;
+        background: var(--accent); color: #fff;
+        border: none; border-radius: 8px; cursor: pointer;
+        transition: all 180ms; display: inline-flex; align-items: center; gap: 0.45rem;
+    }
+    .cf-submit:hover { background: var(--accent2); transform: translateY(-1px); }
+
+    .cf-success {
+        display: none;
+        background: rgba(34,197,94,0.08);
+        border: 1.5px solid rgba(34,197,94,0.25);
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        font-size: 0.875rem;
+        color: #16a34a;
+        margin-top: 0.75rem;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .no-comments {
+        font-size: 0.9rem;
+        color: var(--text3);
+        font-style: italic;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Post nav */
+    .post-nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 2.25rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .pnav-link {
+        background: var(--card);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 1.25rem;
+        text-decoration: none;
+        transition: all 180ms;
+        display: block;
+    }
+
+    .pnav-link:hover { border-color: var(--accent); }
+
+    .pnav-link.next { text-align: right; }
+
+    .pnav-label {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text3);
+        margin-bottom: 0.4rem;
+        display: block;
+    }
+
+    .pnav-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    /* Sidebar */
+    .post-sidebar {
+        position: sticky;
+        top: 80px;
+    }
+
+    .sidebar-box {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 1.1rem 1.25rem;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+    }
+
+    .sidebar-box h4 {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .share-btns { display: flex; gap: 0.5rem; }
+
+    .share-btn {
+        flex: 1;
+        padding: 0.5rem;
+        background: var(--bg2);
+        border: 1.5px solid var(--border);
+        border-radius: 7px;
+        text-align: center;
+        color: var(--text2);
+        text-decoration: none;
+        font-size: 1rem;
+        transition: all 180ms;
+    }
+    .share-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .related-list { list-style: none; }
+    .related-list li { border-bottom: 1px solid var(--border); }
+    .related-list li:last-child { border-bottom: none; }
+    .related-list a {
+        display: block;
+        padding: 0.6rem 0;
+        font-size: 0.875rem;
+        color: var(--text2);
+        text-decoration: none;
+        transition: color 180ms;
+        font-weight: 500;
+    }
+    .related-list a:hover { color: var(--accent); }
+
+    .back-link {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--text3);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0 1.5rem;
+        margin-top: 2.5rem;
+        max-width: var(--max-w);
+        display: block;
+    }
+
+    @media (max-width: 960px) {
+        .post-layout { grid-template-columns: 1fr; gap: 2rem; }
+        .post-sidebar { position: static; }
+    }
+
+    @media (max-width: 640px) {
+        .post-hero { padding: 1.25rem 1rem 1rem; }
+        .post-layout { padding: 1.25rem 1rem 2.5rem; gap: 1.5rem; }
+        .post-cover { margin: 0 0 1.25rem; border-radius: 10px; }
+        .post-nav { grid-template-columns: 1fr; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.25rem; }
+        .comments-section { margin-top: 1.5rem; padding-top: 1.25rem; }
+        .comment-form-wrap { padding: 1rem; margin-top: 1rem; }
+        .sidebar-box { padding: 0.9rem 1rem; margin-bottom: 0.75rem; }
+        .post-title { font-size: clamp(1.4rem, 7vw, 2rem); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- BACK -->
+<div style="max-width:var(--max-w); margin:0 auto; padding:1.5rem 1.5rem 0;">
+    <a href="/blog/" style="font-family:var(--mono); font-size:0.75rem; color:var(--text3); display:inline-flex; align-items:center; gap:0.4rem; text-decoration:none; transition:color 180ms;">
+        <i class="bi bi-arrow-left"></i> Back to Blog
+    </a>
+</div>
+
+<!-- HERO -->
+<section class="post-hero">
+    <div class="post-hero-inner" data-aos="fade-up">
+        <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.9rem;">
+            {% if post.post_type == 'blog' %}
+                <span style="background:rgba(29,78,216,0.1);color:var(--accent);font-family:var(--mono);font-size:0.65rem;font-weight:700;padding:0.22rem 0.65rem;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;">✍ Blog</span>
+            {% elif post.post_type == 'research' %}
+                <span style="background:rgba(90,108,192,0.1);color:#5a6cc0;font-family:var(--mono);font-size:0.65rem;font-weight:700;padding:0.22rem 0.65rem;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;">🔬 Research</span>
+            {% elif post.post_type == 'tutorial' %}
+                <span style="background:rgba(34,160,107,0.1);color:#22a06b;font-family:var(--mono);font-size:0.65rem;font-weight:700;padding:0.22rem 0.65rem;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;">📖 Tutorial</span>
+            {% elif post.post_type == 'note' %}
+                <span style="background:rgba(150,150,150,0.1);color:#888;font-family:var(--mono);font-size:0.65rem;font-weight:700;padding:0.22rem 0.65rem;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;">📌 Note</span>
+            {% endif %}
+        </div>
+        <div class="post-date">{{ post.created_at|date:"F j, Y" }}</div>
+        <h1 class="post-title">{{ post.title }}</h1>
+        <div class="post-meta">
+            {% if post.read_time %}<span><i class="bi bi-clock"></i> {{ post.read_time }} min read</span>{% endif %}
+        </div>
+        {% if post.get_tags_list %}
+        <div class="post-tags">
+            {% for tag in post.get_tags_list %}
+            <span class="post-tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% if post.cover_image %}
+<div class="post-cover" data-aos="fade-up">
+    <img src="{{ post.cover_image.url }}" alt="{{ post.title }}">
+</div>
+{% endif %}
+
+<!-- CONTENT + SIDEBAR -->
+<div class="post-layout">
+    <article>
+        <div class="post-content">
+            {{ post.content|safe }}
+        </div>
+
+        <!-- ── LIKE BUTTON ── -->
+        <div class="like-row">
+            <button class="like-btn {% if user_liked %}liked{% endif %}" id="likeBtn"
+                    data-url="{% url 'like_post' post.slug %}">
+                <span class="heart">{% if user_liked %}❤️{% else %}🤍{% endif %}</span>
+                <span id="likeCount">{{ like_count }}</span>
+                <span>{{ like_count|pluralize:"like,likes" }}</span>
+            </button>
+            <span class="like-note">{% if user_liked %}You liked this post!{% else %}Did you enjoy this? Hit the heart.{% endif %}</span>
+        </div>
+
+        <!-- ── COMMENTS ── -->
+        <div class="comments-section">
+            <h3 class="comments-heading">
+                Comments
+                <span class="comment-count-badge" id="commentCount">{{ comments|length }}</span>
+            </h3>
+
+            <div id="commentsList">
+                {% if comments %}
+                    {% for c in comments %}
+                    <div class="comment-item">
+                        <div class="comment-avatar">{{ c.name|first }}</div>
+                        <div class="comment-bubble">
+                            <div class="comment-meta">
+                                <span class="comment-name">{{ c.name }}</span>
+                                <span class="comment-date">{{ c.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <p class="comment-body">{{ c.body }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-comments" id="noComments">No comments yet — be the first to leave one!</p>
+                {% endif %}
+            </div>
+
+            <!-- Comment form -->
+            <div class="comment-form-wrap">
+                <div class="comment-form-title">💬 Leave a Comment</div>
+                <form id="commentForm" data-url="{% url 'add_comment' post.slug %}">
+                    {% csrf_token %}
+                    <div class="cf-row">
+                        <div class="cf-group">
+                            <label class="cf-label">Name <span style="color:var(--accent)">*</span></label>
+                            <input type="text" name="name" class="cf-input" placeholder="Your name" required>
+                        </div>
+                        <div class="cf-group">
+                            <label class="cf-label">Email <span style="color:var(--text3); font-weight:400;">(optional)</span></label>
+                            <input type="email" name="email" class="cf-input" placeholder="Not shown publicly">
+                        </div>
+                    </div>
+                    <div class="cf-group">
+                        <label class="cf-label">Message <span style="color:var(--accent)">*</span></label>
+                        <textarea name="body" class="cf-textarea" placeholder="Share your thoughts..." required></textarea>
+                    </div>
+                    <button type="submit" class="cf-submit">
+                        <i class="bi bi-send"></i> Post Comment
+                    </button>
+                    <div class="cf-success" id="cfSuccess">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Thanks! Your comment is under review and will appear shortly.
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Post Nav -->
+        <div class="post-nav">
+            {% if previous_post %}
+            <a href="/blog/{{ previous_post.slug }}/" class="pnav-link">
+                <span class="pnav-label"><i class="bi bi-arrow-left"></i> Previous</span>
+                <div class="pnav-title">{{ previous_post.title|truncatewords:5 }}</div>
+            </a>
+            {% else %}<div></div>{% endif %}
+
+            {% if next_post %}
+            <a href="/blog/{{ next_post.slug }}/" class="pnav-link next">
+                <span class="pnav-label">Next <i class="bi bi-arrow-right"></i></span>
+                <div class="pnav-title">{{ next_post.title|truncatewords:5 }}</div>
+            </a>
+            {% else %}<div></div>{% endif %}
+        </div>
+    </article>
+
+    <!-- Sidebar -->
+    <aside class="post-sidebar" data-aos="fade-left">
+        <div class="sidebar-box">
+            <h4>Share this post</h4>
+            <div class="share-btns">
+                <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ request.build_absolute_uri }}" target="_blank" class="share-btn" title="Twitter">
+                    <i class="bi bi-twitter-x"></i>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="share-btn" title="LinkedIn">
+                    <i class="bi bi-linkedin"></i>
+                </a>
+                <a href="mailto:?subject={{ post.title|urlencode }}&body={{ request.build_absolute_uri }}" class="share-btn" title="Email">
+                    <i class="bi bi-envelope"></i>
+                </a>
+            </div>
+        </div>
+
+        {% if related %}
+        <div class="sidebar-box">
+            <h4>More Posts</h4>
+            <ul class="related-list">
+                {% for r in related %}
+                <li><a href="/blog/{{ r.slug }}/">{{ r.title|truncatewords:6 }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="sidebar-box" style="background:var(--accent-bg); border-color:rgba(29,78,216,0.22);">
+            <h4>Let's Connect</h4>
+            <p style="font-size:0.85rem; color:var(--text2); margin-bottom:1rem; line-height:1.6;">
+                Enjoyed this? Reach out for projects, collaborations, or just to talk tech.
+            </p>
+            <a href="/contact/" class="btn-warm" style="width:100%; justify-content:center; font-size:0.85rem; padding:0.6rem 1rem;">
+                Contact Me
+            </a>
+        </div>
+    </aside>
+</div>
+
+<!-- MORE POSTS CTA -->
+<div style="border-top:1px solid var(--border); padding:3rem 1.5rem; text-align:center; background:var(--bg2);">
+    <a href="/blog/" class="btn-outline"><i class="bi bi-arrow-left"></i> Read More Posts</a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Like button ──
+const likeBtn   = document.getElementById('likeBtn');
+const likeCount = document.getElementById('likeCount');
+
+if (likeBtn) {
+    likeBtn.addEventListener('click', function() {
+        const csrfToken = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+        fetch(this.dataset.url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        })
+        .then(r => r.json())
+        .then(d => {
+            likeCount.textContent = d.count;
+            likeBtn.querySelector('span:last-child').textContent = d.count === 1 ? 'like' : 'likes';
+            const note = likeBtn.nextElementSibling;
+            if (d.liked) {
+                likeBtn.classList.add('liked');
+                likeBtn.querySelector('.heart').textContent = '❤️';
+                if (note) note.textContent = 'You liked this post!';
+            } else {
+                likeBtn.classList.remove('liked');
+                likeBtn.querySelector('.heart').textContent = '🤍';
+                if (note) note.textContent = 'Did you enjoy this? Hit the heart.';
+            }
+        });
+    });
+}
+
+// ── Comment form ──
+const commentForm = document.getElementById('commentForm');
+if (commentForm) {
+    commentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data        = new FormData(this);
+        const csrfToken   = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+        const submitBtn   = this.querySelector('.cf-submit');
+
+        submitBtn.disabled     = true;
+        submitBtn.innerHTML    = '<i class="bi bi-hourglass-split"></i> Posting…';
+
+        fetch(this.dataset.url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken },
+            body: data
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (d.status === 'ok') {
+                commentForm.reset();
+                const success = document.getElementById('cfSuccess');
+                success.style.display = 'flex';
+                submitBtn.disabled  = false;
+                submitBtn.innerHTML = '<i class="bi bi-send"></i> Post Comment';
+                const noC = document.getElementById('noComments');
+                if (noC) noC.style.display = 'none';
+            }
+        });
+    });
+}
+</script>
+{% endblock %}
