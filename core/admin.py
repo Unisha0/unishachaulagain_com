@@ -4,7 +4,7 @@ import re
 
 from django.contrib import admin
 from django.contrib import messages
-from django.utils.html import format_html
+from django.utils.html import format_html, mark_safe
 from django_summernote.admin import SummernoteModelAdmin
 
 from .models import BlogPost, Project, Certificate, Achievement, Education, Skill, ContactMessage, PostComment, PostLike, SiteSettings
@@ -143,7 +143,7 @@ class BlogPostAdmin(SummernoteModelAdmin):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display  = ['title', 'category', 'priority_badge', 'featured', 'order', 'github_link']
+    list_display  = ['thumbnail', 'title', 'category', 'priority_badge', 'featured', 'order', 'github_link']
     list_filter   = ['category', 'priority', 'featured']
     list_editable = ['featured', 'order']
     search_fields = ['title', 'description', 'tech_stack']
@@ -156,23 +156,49 @@ class ProjectAdmin(admin.ModelAdmin):
         ('Links', {
             'fields': ('github_url', 'live_url'),
         }),
+        ('Image', {
+            'fields': ('image', 'image_preview'),
+            'description': 'Upload a project screenshot or cover image. Recommended: 800×500 px.',
+        }),
         ('Display', {
-            'fields': ('image', 'featured', 'order'),
+            'fields': ('featured', 'order'),
         }),
     )
 
+    readonly_fields = ['image_preview']
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-width:480px;max-height:280px;'
+                'border-radius:8px;border:1px solid #e0e0e0;margin-top:6px;" />',
+                obj.image.url
+            )
+        return format_html('<span style="color:#aaa;">No image uploaded yet.</span>')
+    image_preview.short_description = 'Current image'
+
+    def thumbnail(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="width:56px;height:36px;object-fit:cover;'
+                'border-radius:4px;border:1px solid #ddd;" />',
+                obj.image.url
+            )
+        return mark_safe('<span style="color:#ccc;font-size:11px;">—</span>')
+    thumbnail.short_description = ''
+
     def priority_badge(self, obj):
         if obj.priority == 'major':
-            return format_html(
+            return mark_safe(
                 '<span style="background:#fef9c3;color:#b45309;padding:2px 8px;'
                 'border-radius:10px;font-size:11px;font-weight:700;">⭐ Major</span>'
             )
         elif obj.priority == 'minor':
-            return format_html(
+            return mark_safe(
                 '<span style="background:#ede9fe;color:#6d28d9;padding:2px 8px;'
                 'border-radius:10px;font-size:11px;font-weight:700;">· Minor</span>'
             )
-        return format_html('<span style="color:#aaa;font-size:11px;">Standard</span>')
+        return mark_safe('<span style="color:#aaa;font-size:11px;">Standard</span>')
     priority_badge.short_description = 'Priority'
 
     def github_link(self, obj):
