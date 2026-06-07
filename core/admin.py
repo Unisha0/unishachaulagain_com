@@ -174,7 +174,7 @@ class ProjectAdmin(admin.ModelAdmin):
                 'border-radius:8px;border:1px solid #e0e0e0;margin-top:6px;" />',
                 obj.image.url
             )
-        return format_html('<span style="color:#aaa;">No image uploaded yet.</span>')
+        return mark_safe('<span style="color:#aaa;">No image uploaded yet.</span>')
     image_preview.short_description = 'Current image'
 
     def thumbnail(self, obj):
@@ -251,8 +251,8 @@ class PostCommentAdmin(admin.ModelAdmin):
 
     def approved_badge(self, obj):
         if obj.approved:
-            return format_html('<span style="color:#22a06b;font-weight:700;">✓ Approved</span>')
-        return format_html('<span style="color:#c05a2c;font-weight:700;">⏳ Pending</span>')
+            return mark_safe('<span style="color:#22a06b;font-weight:700;">✓ Approved</span>')
+        return mark_safe('<span style="color:#c05a2c;font-weight:700;">⏳ Pending</span>')
     approved_badge.short_description = 'Status'
 
     @admin.action(description='✅ Approve selected comments')
@@ -298,14 +298,43 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):
-    list_display    = ['name', 'email', 'subject', 'received_at', 'read', 'read_badge']
+    list_display    = ['name', 'email', 'subject', 'preview', 'received_at', 'read', 'read_badge']
     list_filter     = ['read']
     list_editable   = ['read']
-    readonly_fields = ['name', 'email', 'subject', 'message', 'received_at']
+    search_fields   = ['name', 'email', 'subject', 'message']
+    readonly_fields = ['name', 'email', 'subject', 'message_display', 'received_at']
     ordering        = ['-received_at']
+
+    fieldsets = (
+        ('From', {
+            'fields': ('name', 'email', 'received_at'),
+        }),
+        ('Message', {
+            'fields': ('subject', 'message_display'),
+        }),
+        ('Status', {
+            'fields': ('read',),
+        }),
+    )
+
+    def preview(self, obj):
+        return obj.message[:80] + ('…' if len(obj.message) > 80 else '')
+    preview.short_description = 'Message preview'
+
+    def message_display(self, obj):
+        return format_html(
+            '<div style="white-space:pre-wrap;padding:12px;background:#f9f9f9;'
+            'border:1px solid #e0e0e0;border-radius:6px;font-size:13px;line-height:1.6;">'
+            '{}</div>',
+            obj.message
+        )
+    message_display.short_description = 'Message'
 
     def read_badge(self, obj):
         if obj.read:
-            return format_html('<span style="color:#22a06b;font-weight:600;">✓ Read</span>')
-        return format_html('<span style="color:#c05a2c;font-weight:600;">● New</span>')
+            return mark_safe('<span style="color:#22a06b;font-weight:600;">✓ Read</span>')
+        return mark_safe('<span style="color:#c05a2c;font-weight:600;">● New</span>')
     read_badge.short_description = 'Status'
+
+    def has_add_permission(self, request):
+        return False

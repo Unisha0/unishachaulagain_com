@@ -6,6 +6,7 @@ charset-normalizer==3.4.7
 cobble==0.1.4
 cryptography==48.0.0
 Django==6.0.5
+python-dotenv==1.2.2
 django-summernote==0.8.20.0
 gunicorn==26.0.0
 mammoth==1.12.0

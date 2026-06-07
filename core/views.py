@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.conf import settings
 from .models import BlogPost, Project, Certificate, Achievement, Education, Skill, ContactMessage, PostLike, PostComment, SiteSettings
 
@@ -111,9 +111,9 @@ def contact(request):
 
         # Email notification to Unisha's inbox
         try:
-            send_mail(
+            msg = EmailMessage(
                 subject=f'[Portfolio] {subject} — from {name}',
-                message=(
+                body=(
                     f'New contact message from your portfolio:\n\n'
                     f'Name:    {name}\n'
                     f'Email:   {email}\n'
@@ -122,10 +122,10 @@ def contact(request):
                     f'---\nReply directly to this email to respond.'
                 ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[settings.CONTACT_RECIPIENT_EMAIL],
+                to=[settings.CONTACT_RECIPIENT_EMAIL],
                 reply_to=[email],
-                fail_silently=True,
             )
+            msg.send(fail_silently=False)
         except Exception:
             pass  # message already saved to DB; email failure is non-fatal
 
