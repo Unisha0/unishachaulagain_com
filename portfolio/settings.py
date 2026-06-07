@@ -1,11 +1,31 @@
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-change-this-in-production-unisha-portfolio-2024'
-DEBUG = True
-ALLOWED_HOSTS = ['*', 'unishachaulagain.com.np', 'localhost', '127.0.0.1']
+
+def env_bool(name, default=False):
+    return os.environ.get(name, str(default)).lower() in ('true', '1', 'yes')
+
+
+def env_list(name, default=''):
+    return [value.strip() for value in os.environ.get(name, default).split(',') if value.strip()]
+
+
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-change-this-in-production-unisha-portfolio-2024',
+)
+DEBUG = env_bool('DJANGO_DEBUG', True)
+ALLOWED_HOSTS = env_list(
+    'DJANGO_ALLOWED_HOSTS',
+    'unishachaulagain.com.np,localhost,127.0.0.1',
+)
+CSRF_TRUSTED_ORIGINS = env_list(
+    'DJANGO_CSRF_TRUSTED_ORIGINS',
+    'https://unishachaulagain.com.np,https://www.unishachaulagain.com.np',
+)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,6 +40,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -75,6 +96,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ── Contact form email ──
@@ -86,14 +109,35 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #   2. Create an app password for "Mail"
 #   3. Paste it as EMAIL_HOST_PASSWORD below
 #
-EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST          = 'smtp.gmail.com'
-EMAIL_PORT          = 587
-EMAIL_USE_TLS       = True
-EMAIL_HOST_USER     = 'yunishachaulagain001@gmail.com'
-EMAIL_HOST_PASSWORD = 'jxmw chcd cnhx rvye'
-DEFAULT_FROM_EMAIL  = 'Unisha Portfolio <yunishachaulagain001@gmail.com>'
-CONTACT_RECIPIENT_EMAIL = 'yunishachaulagain001@gmail.com'
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.smtp.EmailBackend',
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = env_bool('EMAIL_USE_TLS', True)
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'yunishachaulagain001@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', f'Unisha Portfolio <{EMAIL_HOST_USER}>')
+CONTACT_RECIPIENT_EMAIL = os.environ.get('CONTACT_RECIPIENT_EMAIL', EMAIL_HOST_USER)
+
+if not DEBUG:
+    if SECRET_KEY == 'django-insecure-change-this-in-production-unisha-portfolio-2024':
+        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be defined in production.')
+
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 
 # ── Summernote rich text editor ──

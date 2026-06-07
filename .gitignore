@@ -1,0 +1,52 @@
+# Python
+*.py[cod]
+__pycache__/
+*.pyo
+*.pyd
+*.pyc
+*.pyd
+*.so
+*.sqlite3
+*.sqlite
+*.log
+*.pot
+*.pyc
+*~
+*.swp
+
+# Django
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+.DS_Store
+.env
+.env.*
+
+# Virtualenv
+venv/
+ENV/
+env/
+.venv/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# PyCharm
+.idea/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+
+# Pytest
+.pytest_cache/
+
+# Node
+node_modules/

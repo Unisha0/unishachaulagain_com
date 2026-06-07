@@ -50,13 +50,56 @@ In `core/templates/core/home.html`, find the `photo-placeholder` div and replace
 ```
 Upload your photo via the media folder.
 
-## 🌐 Deployment (on your domain unishachaulagain.com.np)
+## 🌐 Deployment (Production-ready for unishachaulagain.com.np)
 
-1. Set `DEBUG = False` in settings.py
-2. Set `SECRET_KEY` to a strong random key
-3. Run `python manage.py collectstatic`
-4. Use gunicorn + nginx (recommended)
-5. Point domain DNS to your server
+This project is configured for `unishachaulagain.com.np` and `www.unishachaulagain.com.np`.
+The Django settings now use environment variables for security and deploy static files using `whitenoise`.
+
+### Required environment variables
+Create a local `.env` file or export the values before running the app:
+```bash
+export DJANGO_SECRET_KEY='your-strong-secret-key'
+export DJANGO_DEBUG=False
+export DJANGO_ALLOWED_HOSTS='unishachaulagain.com.np,www.unishachaulagain.com.np'
+export DJANGO_CSRF_TRUSTED_ORIGINS='https://unishachaulagain.com.np,https://www.unishachaulagain.com.np'
+export EMAIL_HOST='smtp.gmail.com'
+export EMAIL_PORT=587
+export EMAIL_USE_TLS=True
+export EMAIL_HOST_USER='your-email@example.com'
+export EMAIL_HOST_PASSWORD='your-email-app-password'
+export DEFAULT_FROM_EMAIL='Unisha Portfolio <your-email@example.com>'
+export CONTACT_RECIPIENT_EMAIL='your-email@example.com'
+```
+
+### Deploy steps
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Set the environment variables above.
+3. Run migrations:
+   ```bash
+   python manage.py migrate
+   ```
+4. Load initial data:
+   ```bash
+   python manage.py loaddata core/fixtures/initial_data.json
+   ```
+5. Collect static files:
+   ```bash
+   python manage.py collectstatic
+   ```
+6. Start the app with Gunicorn:
+   ```bash
+   gunicorn portfolio.wsgi:application --bind 0.0.0.0:8000
+   ```
+
+For production, run behind a reverse proxy such as nginx and serve HTTPS for `unishachaulagain.com.np`.
+
+### Notes
+- `DEBUG` must be `False` in production.
+- `DJANGO_SECRET_KEY` must be a strong unique secret.
+- Do not commit `.env` or any credentials to GitHub.
 
 ## 📁 Project Structure
 
